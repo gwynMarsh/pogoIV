@@ -6,25 +6,33 @@
   <title>Pokémon GO Evaluator</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px 16px; max-width: 360px; margin: 0 auto; text-align: center; background-color: #f4f4f7; color: #333; -webkit-tap-highlight-color: transparent; }
-    h2 { margin-bottom: 16px; font-size: 22px; }
-    .input-group { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 16px; }
-    input { width: 100%; padding: 12px; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 10px; text-align: center; background: #fff; }
-button { 
-  width: 100%; 
-  padding: 14px; 
-  background-color: #d63731; /* Pokéball Red */
-  color: white; 
-  border: 3px solid #222222; 
-  border-radius: 10px; 
-  font-size: 16px; 
-  font-weight: 600; 
-  cursor: pointer; 
-}
-button:active { 
-  background-color: #990000; 
-}
-    .result-main { font-size: 28px; font-weight: bold; color: #d63731; margin-top: 24px; }
-    .result-sub { font-size: 18px; color: #555; margin-top: 8px; }
+    h2 { margin-bottom: 24px; font-size: 22px; }
+   .input-group { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 20px; text-align: left; }
+    input[type="text"], input[type="number"] { width: 100%; padding: 14px 12px; font-size: 18px; box-sizing: border-box; border: 1.5px solid #ccc; border-radius: 12px; text-align: center; background: #fff; appearance: none; -webkit-appearance: none; }
+    
+    /* --- Mac UI Slider Styles --- */
+    .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #444; }
+    .slider-header span.val { color: #CC0000; font-size: 17px; }
+    
+    input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; outline: none; }
+    
+    /* Track */
+    input[type=range]::-webkit-slider-runnable-track { height: 6px; background: #d1d1d6; border-radius: 3px; cursor: pointer; }
+    
+    /* Thumb (The draggable circle) */
+    input[type=range]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: #fff; border: 1px solid #ccc; margin-top: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.25); cursor: pointer; }
+    
+    /* Tick Marks (Ruler Dots) */
+    .slider-marks { display: flex; justify-content: space-between; padding: 0 12px; margin-top: 8px; pointer-events: none; }
+    .slider-marks i { width: 3px; height: 3px; background: #999; border-radius: 50%; }
+
+    /* Pokéball Button */
+    button { width: 100%; padding: 16px; background-color: #CC0000; color: white; border: 2px solid #222222; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:active { background-color: #990000; }
+    
+    .result-main { font-size: 24px; font-weight: bold; color: #CC0000; margin-top: 16px; }
+    .result-sub { font-size: 15px; color: #555; margin-top: 6px; }
   </style>
   <script>
     // Embedded Base Stats (Atk, Def, Sta)
@@ -34,6 +42,21 @@ button:active {
 const cpmTable = {
       1.0: 0.094, 1.5: 0.135137, 2.0: 0.166398, 2.5: 0.192651, 3.0: 0.215733, 3.5: 0.23657, 4.0: 0.25572, 4.5: 0.27353, 5.0: 0.290249, 5.5: 0.306057, 6.0: 0.321087, 6.5: 0.335445, 7.0: 0.349212, 7.5: 0.362457, 8.0: 0.375235, 8.5: 0.387592, 9.0: 0.399565, 9.5: 0.411193, 10.0: 0.4225, 10.5: 0.432926, 11.0: 0.4431, 11.5: 0.453059, 12.0: 0.462798, 12.5: 0.472336, 13.0: 0.481684, 13.5: 0.490856, 14.0: 0.499858, 14.5: 0.508701, 15.0: 0.5173939, 15.5: 0.525942, 16.0: 0.534354, 16.5: 0.542635, 17.0: 0.55079, 17.5: 0.558824, 18.0: 0.56674, 18.5: 0.574543, 19.0: 0.582235, 19.5: 0.58982, 20.0: 0.5974, 20.5: 0.604824, 21.0: 0.612157, 21.5: 0.619404, 22.0: 0.626567, 22.5: 0.633649, 23.0: 0.640652, 23.5: 0.64758, 24.0: 0.654432, 24.5: 0.661211, 25.0: 0.667934, 25.5: 0.674599, 26.0: 0.681199, 26.5: 0.687737, 27.0: 0.694216, 27.5: 0.700638, 28.0: 0.707, 28.5: 0.713306, 29.0: 0.719555, 29.5: 0.725749, 30.0: 0.7317, 30.5: 0.734741, 31.0: 0.737769, 31.5: 0.740785, 32.0: 0.743789, 32.5: 0.746781, 33.0: 0.749761, 33.5: 0.752729, 34.0: 0.755685, 34.5: 0.75863, 35.0: 0.7615638, 35.5: 0.764486, 36.0: 0.767397, 36.5: 0.770297, 37.0: 0.773186, 37.5: 0.776065, 38.0: 0.778933, 38.5: 0.78179, 39.0: 0.784636, 39.5: 0.787472, 40.0: 0.7903, 40.5: 0.7953, 41.0: 0.8003, 41.5: 0.8053, 42.0: 0.8103, 42.5: 0.8153, 43.0: 0.8203, 43.5: 0.8253, 44.0: 0.8303, 44.5: 0.8353, 45.0: 0.8403, 45.5: 0.8453, 46.0: 0.8503, 46.5: 0.8553, 47.0: 0.8603, 47.5: 0.8653, 48.0: 0.8703, 48.5: 0.8753, 49.0: 0.8803, 49.5: 0.8853, 50.0: 0.8903
     };
+
+    // Auto-populate the datalist for the text input dropdown
+    window.onload = function() {
+      const datalist = document.getElementById("pokemon-list");
+      Object.keys(baseStatsDb).forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        datalist.appendChild(option);
+      });
+    };
+
+    // Updates the red number label above each slider dynamically
+    function updateVal(id) {
+      document.getElementById(id + "-val").innerText = document.getElementById(id).value;
+    }
 
     function calcAll() {
       const resMain = document.getElementById("result-main");
@@ -79,40 +102,49 @@ const cpmTable = {
 <body>
   <h2>Pokémon Evaluator</h2>
   <div class="input-group">
-    <input id="name" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false">
-    <input id="cp" type="number" inputmode="numeric" placeholder="CP">
-<!-- IV Select Row (Triggers iOS Wheel Picker) -->
-    <div class="iv-row">
-      <select id="atk" onchange="calcAll()">
-        <option value="" disabled selected>Atk IV</option>
-        <option value="15">15</option><option value="14">14</option><option value="13">13</option>
-        <option value="12">12</option><option value="11">11</option><option value="10">10</option>
-        <option value="9">9</option><option value="8">8</option><option value="7">7</option>
-        <option value="6">6</option><option value="5">5</option><option value="4">4</option>
-        <option value="3">3</option><option value="2">2</option><option value="1">1</option>
-        <option value="0">0</option>
-      </select>
+    
+    <!-- Autocomplete Text Input -->
+    <input id="name" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="calcAll()">
+    <datalist id="pokemon-list"></datalist>
 
-      <select id="def" onchange="calcAll()">
-        <option value="" disabled selected>Def IV</option>
-        <option value="15">15</option><option value="14">14</option><option value="13">13</option>
-        <option value="12">12</option><option value="11">11</option><option value="10">10</option>
-        <option value="9">9</option><option value="8">8</option><option value="7">7</option>
-        <option value="6">6</option><option value="5">5</option><option value="4">4</option>
-        <option value="3">3</option><option value="2">2</option><option value="1">1</option>
-        <option value="0">0</option>
-      </select>
-
-      <select id="hp" onchange="calcAll()">
-        <option value="" disabled selected>HP IV</option>
-        <option value="15">15</option><option value="14">14</option><option value="13">13</option>
-        <option value="12">12</option><option value="11">11</option><option value="10">10</option>
-        <option value="9">9</option><option value="8">8</option><option value="7">7</option>
-        <option value="6">6</option><option value="5">5</option><option value="4">4</option>
-        <option value="3">3</option><option value="2">2</option><option value="1">1</option>
-        <option value="0">0</option>
-      </select>
+    <input id="cp" type="number" inputmode="numeric" placeholder="CP" oninput="calcAll()">
+    
+    <!-- Atk Slider -->
+    <div class="slider-wrapper">
+      <div class="slider-header">
+        <span>Attack IV</span>
+        <span class="val" id="atk-val">15</span>
+      </div>
+      <input type="range" id="atk" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
+      <div class="slider-marks">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
     </div>
+
+    <!-- Def Slider -->
+    <div class="slider-wrapper">
+      <div class="slider-header">
+        <span>Defense IV</span>
+        <span class="val" id="def-val">15</span>
+      </div>
+      <input type="range" id="def" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">
+      <div class="slider-marks">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+
+    <!-- HP Slider -->
+    <div class="slider-wrapper">
+      <div class="slider-header">
+        <span>HP IV</span>
+        <span class="val" id="hp-val">15</span>
+      </div>
+      <input type="range" id="hp" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">
+      <div class="slider-marks">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+
     <button onclick="calcAll()">Calculate</button>
   </div>
   <div id="result-main" class="result-main"></div>
