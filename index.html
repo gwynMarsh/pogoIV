@@ -81,9 +81,38 @@ const cpmTable = {
   <div class="input-group">
     <input id="name" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false">
     <input id="cp" type="number" inputmode="numeric" placeholder="CP">
-    <input id="atk" type="number" inputmode="numeric" placeholder="Attack IV (0-15)" min="0" max="15">
-    <input id="def" type="number" inputmode="numeric" placeholder="Defense IV (0-15)" min="0" max="15">
-    <input id="hp" type="number" inputmode="numeric" placeholder="HP IV (0-15)" min="0" max="15">
+<!-- IV Select Row (Triggers iOS Wheel Picker) -->
+    <div class="iv-row">
+      <select id="atk" onchange="calcAll()">
+        <option value="" disabled selected>Atk IV</option>
+        <option value="15">15</option><option value="14">14</option><option value="13">13</option>
+        <option value="12">12</option><option value="11">11</option><option value="10">10</option>
+        <option value="9">9</option><option value="8">8</option><option value="7">7</option>
+        <option value="6">6</option><option value="5">5</option><option value="4">4</option>
+        <option value="3">3</option><option value="2">2</option><option value="1">1</option>
+        <option value="0">0</option>
+      </select>
+
+      <select id="def" onchange="calcAll()">
+        <option value="" disabled selected>Def IV</option>
+        <option value="15">15</option><option value="14">14</option><option value="13">13</option>
+        <option value="12">12</option><option value="11">11</option><option value="10">10</option>
+        <option value="9">9</option><option value="8">8</option><option value="7">7</option>
+        <option value="6">6</option><option value="5">5</option><option value="4">4</option>
+        <option value="3">3</option><option value="2">2</option><option value="1">1</option>
+        <option value="0">0</option>
+      </select>
+
+      <select id="hp" onchange="calcAll()">
+        <option value="" disabled selected>HP IV</option>
+        <option value="15">15</option><option value="14">14</option><option value="13">13</option>
+        <option value="12">12</option><option value="11">11</option><option value="10">10</option>
+        <option value="9">9</option><option value="8">8</option><option value="7">7</option>
+        <option value="6">6</option><option value="5">5</option><option value="4">4</option>
+        <option value="3">3</option><option value="2">2</option><option value="1">1</option>
+        <option value="0">0</option>
+      </select>
+    </div>
     <button onclick="calcAll()">Calculate</button>
   </div>
   <div id="result-main" class="result-main"></div>
