@@ -47,15 +47,21 @@
   </style>
 
   <script src="db.js"></script>
+<script>
+    // Create a lowercase version of the database for the math engine
+    let lowerCaseDb = {};
 
-  <script>
     window.onload = function() {
       const datalist = document.getElementById("pokemon-list");
       if (typeof baseStatsDb !== 'undefined') {
         Object.keys(baseStatsDb).forEach(name => {
+          // Populate the dropdown with nicely capitalized names
           const option = document.createElement("option");
           option.value = name;
           datalist.appendChild(option);
+          
+          // Populate our math engine with lowercase names to prevent errors
+          lowerCaseDb[name.toLowerCase()] = baseStatsDb[name];
         });
       }
       calcAll();
@@ -85,12 +91,14 @@
         return;
       }
 
-      if (!nameInput || !cp || !baseStatsDb[nameInput]) {
-        resSub.innerText = baseStatsDb[nameInput] ? "Enter CP to find Level" : `(${ivSum}/45 IV) • Enter valid species for Level`;
+      // Check the new lowercase database instead of the original one
+      if (!nameInput || !cp || !lowerCaseDb[nameInput]) {
+        resSub.innerText = lowerCaseDb[nameInput] ? "Enter CP to find Level" : `(${ivSum}/45 IV) • Enter valid species for Level`;
         return;
       }
 
-      const base = baseStatsDb[nameInput];
+      // Pull stats from the new lowercase database
+      const base = lowerCaseDb[nameInput];
       const totalAtk = base[0] + atkIV;
       const totalDef = base[1] + defIV;
       const totalSta = base[2] + hpIV;
@@ -114,8 +122,7 @@
 <body>
   <h2>Pokémon Evaluator</h2>
   <div class="input-group">
-    <input id="name" type="text" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="calcAll()">
-    <datalist id="pokemon-list"></datalist>
+    <input id="name" type="text" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" oninput="calcAll()">    <datalist id="pokemon-list"></datalist>
     <input id="cp" type="number" inputmode="numeric" placeholder="CP" autocomplete="off" oninput="calcAll()">
     
     <div class="slider-wrapper">
