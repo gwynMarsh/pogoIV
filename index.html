@@ -34,7 +34,7 @@
 
     /* Custom Desaturated Dark Teal Result Container */
     .result-container {
-      background-color: #1b332d;
+      background-color: #333333;
       color: #ffffff;
       border-radius: 20px;
       padding: 18px 16px;
@@ -153,7 +153,7 @@
       }
 
       if (!nameInput || !cp || !lowerCaseDb[nameInput]) {
-        resSub.innerText = lowerCaseDb[nameInput] ? "Enter CP to find Level" : `(${ivSum}/45 IV) • Enter valid species for Level`;
+        resSub.innerText = lowerCaseDb[nameInput] ? "Enter CP to find Level" : `${ivSum}/45 IV • Enter valid species for Level`;
         atkValEl.innerText = "-"; defValEl.innerText = "-"; hpValEl.innerText = "-";
         atkArc.style.strokeDashoffset = maxArcLength;
         defArc.style.strokeDashoffset = maxArcLength;
