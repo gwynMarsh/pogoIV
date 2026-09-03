@@ -22,7 +22,6 @@
     .slider-marks { display: flex; justify-content: space-between; padding: 0 12px; margin-top: 8px; pointer-events: none; }
     .slider-marks i { width: 2px; height: 2px; background: #aaa; border-radius: 50%; }
     
-    /* Bolder marks for 0, 5, 10, and 15 */
     .slider-marks i:nth-child(1),
     .slider-marks i:nth-child(6),
     .slider-marks i:nth-child(11),
@@ -33,9 +32,8 @@
       border-radius: 2px;
     }
 
-    /* Green Squircle Result Container */
     .result-container {
-      background-color: #38765B;
+      background-color: #26332c;
       color: #ffffff;
       border-radius: 20px;
       padding: 18px 16px;
@@ -43,24 +41,72 @@
       box-shadow: 0 4px 12px rgba(56, 118, 91, 0.25);
     }
     .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
-    .result-sub { font-size: 15px; color: #e2f0d9; margin-top: 6px; }
+    .result-sub { font-size: 15px; color: #bbf7d0; margin-top: 6px; }
+    
+    /* 3-Column Layout with Vertical Dividers and Gauges */
+    .result-stats { 
+      display: flex; 
+      justify-content: space-evenly; 
+      margin-top: 14px; 
+      padding-top: 14px; 
+      border-top: 1px solid rgba(255, 255, 255, 0.15); 
+    }
+    .stat-col { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      position: relative;
+    }
+    .stat-col:not(:last-child) {
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    
+    /* Gauge Styles */
+    .gauge-box {
+      position: relative;
+      width: 72px;
+      height: 42px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 2px;
+    }
+    .gauge-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .gauge-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      z-index: 2;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .stat-label { 
+      font-size: 11px; 
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-top: 2px; 
+    }
   </style>
 
   <script src="db.js"></script>
-<script>
-    // Create a lowercase version of the database for the math engine
+
+  <script>
     let lowerCaseDb = {};
 
     window.onload = function() {
       const datalist = document.getElementById("pokemon-list");
       if (typeof baseStatsDb !== 'undefined') {
         Object.keys(baseStatsDb).forEach(name => {
-          // Populate the dropdown with nicely capitalized names
           const option = document.createElement("option");
           option.value = name;
           datalist.appendChild(option);
-          
-          // Populate our math engine with lowercase names to prevent errors
           lowerCaseDb[name.toLowerCase()] = baseStatsDb[name];
         });
       }
@@ -74,6 +120,14 @@
     function calcAll() {
       const resMain = document.getElementById("result-main");
       const resSub = document.getElementById("result-sub");
+      
+      const atkValEl = document.getElementById("atk-val-text");
+      const defValEl = document.getElementById("def-val-text");
+      const hpValEl = document.getElementById("hp-val-text");
+      
+      const atkArc = document.getElementById("atk-arc");
+      const defArc = document.getElementById("def-arc");
+      const hpArc = document.getElementById("hp-arc");
 
       const nameInput = document.getElementById("name").value.trim().toLowerCase();
       const cp = Number(document.getElementById("cp").value);
@@ -86,18 +140,26 @@
 
       resMain.innerText = `${ivPercent}% IV`;
 
+      const maxArcLength = 47.12; // Half circle circumference for r=15
+
       if (typeof baseStatsDb === 'undefined' || typeof cpmTable === 'undefined') {
         resSub.innerText = "Error: db.js not found";
+        atkValEl.innerText = "-"; defValEl.innerText = "-"; hpValEl.innerText = "-";
+        atkArc.style.strokeDashoffset = maxArcLength;
+        defArc.style.strokeDashoffset = maxArcLength;
+        hpArc.style.strokeDashoffset = maxArcLength;
         return;
       }
 
-      // Check the new lowercase database instead of the original one
       if (!nameInput || !cp || !lowerCaseDb[nameInput]) {
         resSub.innerText = lowerCaseDb[nameInput] ? "Enter CP to find Level" : `(${ivSum}/45 IV) • Enter valid species for Level`;
+        atkValEl.innerText = "-"; defValEl.innerText = "-"; hpValEl.innerText = "-";
+        atkArc.style.strokeDashoffset = maxArcLength;
+        defArc.style.strokeDashoffset = maxArcLength;
+        hpArc.style.strokeDashoffset = maxArcLength;
         return;
       }
 
-      // Pull stats from the new lowercase database
       const base = lowerCaseDb[nameInput];
       const totalAtk = base[0] + atkIV;
       const totalDef = base[1] + defIV;
@@ -115,14 +177,36 @@
         }
       }
 
+      const selectedCPM = cpmTable[closestLevel];
+      const calculatedAtk = Number((totalAtk * selectedCPM).toFixed(1));
+      const calculatedDef = Number((totalDef * selectedCPM).toFixed(1));
+      const calculatedHp = Math.max(10, Math.floor(totalSta * selectedCPM));
+
       resSub.innerText = `Level ${closestLevel} (${ivSum}/45 IV)`;
+      
+      // Update Text Values
+      atkValEl.innerText = calculatedAtk;
+      defValEl.innerText = calculatedDef;
+      hpValEl.innerText = calculatedHp;
+
+      // Update Gauge Arcs (Max stat reference scale set to 350 for gauge visualization)
+      const statCap = 350;
+      
+      const atkRatio = Math.min(1, calculatedAtk / statCap);
+      const defRatio = Math.min(1, calculatedDef / statCap);
+      const hpRatio = Math.min(1, calculatedHp / statCap);
+
+      atkArc.style.strokeDashoffset = maxArcLength * (1 - atkRatio);
+      defArc.style.strokeDashoffset = maxArcLength * (1 - defRatio);
+      hpArc.style.strokeDashoffset = maxArcLength * (1 - hpRatio);
     }
   </script>
 </head>
 <body>
   <h2>Pokémon Evaluator</h2>
   <div class="input-group">
-    <input id="name" type="text" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" oninput="calcAll()">    <datalist id="pokemon-list"></datalist>
+    <input id="name" type="text" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" oninput="calcAll()">
+    <datalist id="pokemon-list"></datalist>
     <input id="cp" type="number" inputmode="numeric" placeholder="CP" autocomplete="off" oninput="calcAll()">
     
     <div class="slider-wrapper">
@@ -162,6 +246,44 @@
   <div class="result-container">
     <div id="result-main" class="result-main">100.00% IV</div>
     <div id="result-sub" class="result-sub">Enter Pokémon Name & CP</div>
+    
+    <div class="result-stats">
+      <!-- ATK Column -->
+      <div class="stat-col">
+        <div class="gauge-box">
+          <svg viewBox="0 0 36 21" class="gauge-svg">
+            <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
+            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+          </svg>
+          <div class="gauge-val" id="atk-val-text">-</div>
+        </div>
+        <div class="stat-label" style="color: #38bdf8;">ATK</div>
+      </div>
+
+      <!-- DEF Column -->
+      <div class="stat-col">
+        <div class="gauge-box">
+          <svg viewBox="0 0 36 21" class="gauge-svg">
+            <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
+            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#a3e635" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+          </svg>
+          <div class="gauge-val" id="def-val-text">-</div>
+        </div>
+        <div class="stat-label" style="color: #a3e635;">DEF</div>
+      </div>
+
+      <!-- HP Column -->
+      <div class="stat-col">
+        <div class="gauge-box">
+          <svg viewBox="0 0 36 21" class="gauge-svg">
+            <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
+            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#ec4899" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+          </svg>
+          <div class="gauge-val" id="hp-val-text">-</div>
+        </div>
+        <div class="stat-label" style="color: #ec4899;">HP</div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
