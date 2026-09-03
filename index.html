@@ -45,17 +45,19 @@
     .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
     .result-sub { font-size: 15px; color: #e2f0d9; margin-top: 6px; }
   </style>
+
   <script src="db.js"></script>
+
   <script>
-    // window.onload, calcAll(), updateVal() and event listeners run here
-  </script>
     window.onload = function() {
       const datalist = document.getElementById("pokemon-list");
-      Object.keys(baseStatsDb).forEach(name => {
-        const option = document.createElement("option");
-        option.value = name;
-        datalist.appendChild(option);
-      });
+      if (typeof baseStatsDb !== 'undefined') {
+        Object.keys(baseStatsDb).forEach(name => {
+          const option = document.createElement("option");
+          option.value = name;
+          datalist.appendChild(option);
+        });
+      }
       calcAll();
     };
 
@@ -77,6 +79,11 @@
       const ivPercent = ((ivSum / 45) * 100).toFixed(2);
 
       resMain.innerText = `${ivPercent}% IV`;
+
+      if (typeof baseStatsDb === 'undefined' || typeof cpmTable === 'undefined') {
+        resSub.innerText = "Error: db.js not found";
+        return;
+      }
 
       if (!nameInput || !cp || !baseStatsDb[nameInput]) {
         resSub.innerText = baseStatsDb[nameInput] ? "Enter CP to find Level" : `(${ivSum}/45 IV) • Enter valid species for Level`;
@@ -112,7 +119,6 @@
 
     <input id="cp" type="number" inputmode="numeric" placeholder="CP" oninput="calcAll()">
     
-    <!-- Atk Slider -->
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Attack IV</span>
@@ -124,7 +130,6 @@
       </div>
     </div>
 
-    <!-- Def Slider -->
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Defense IV</span>
@@ -136,7 +141,6 @@
       </div>
     </div>
 
-    <!-- HP Slider -->
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>HP IV</span>
@@ -149,7 +153,6 @@
     </div>
   </div>
 
-  <!-- Green Squircle Result Display (No Calculate Button) -->
   <div class="result-container">
     <div id="result-main" class="result-main">100.00% IV</div>
     <div id="result-sub" class="result-sub">Enter Pokémon Name & CP</div>
