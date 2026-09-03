@@ -32,16 +32,17 @@
       border-radius: 2px;
     }
 
+    /* Custom Desaturated Dark Teal Result Container */
     .result-container {
-      background-color: #26332c;
+      background-color: #1b332d;
       color: #ffffff;
       border-radius: 20px;
       padding: 18px 16px;
       margin-top: 20px;
-      box-shadow: 0 4px 12px rgba(56, 118, 91, 0.25);
+      box-shadow: 0 4px 12px rgba(27, 51, 45, 0.3);
     }
     .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
-    .result-sub { font-size: 15px; color: #bbf7d0; margin-top: 6px; }
+    .result-sub { font-size: 15px; color: #99f6e4; margin-top: 6px; }
     
     /* 3-Column Layout with Vertical Dividers and Gauges */
     .result-stats { 
@@ -248,7 +249,7 @@
     <div id="result-sub" class="result-sub">Enter Pokémon Name & CP</div>
     
     <div class="result-stats">
-      <!-- ATK Column -->
+      <!-- ATK Column (Cool Blue/Cyan) -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
@@ -260,7 +261,7 @@
         <div class="stat-label" style="color: #38bdf8;">ATK</div>
       </div>
 
-      <!-- DEF Column -->
+      <!-- DEF Column (Muted Lime/Green) -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
@@ -272,16 +273,16 @@
         <div class="stat-label" style="color: #a3e635;">DEF</div>
       </div>
 
-      <!-- HP Column -->
+      <!-- HP Column (Teal / Mint) -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#ec4899" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="hp-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #ec4899;">HP</div>
+        <div class="stat-label" style="color: #2dd4bf;">HP</div>
       </div>
     </div>
   </div>
