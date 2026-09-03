@@ -1421,7 +1421,7 @@ const baseStatsDb = {
  "Pecharunt": [ 164, 248, 186 ]
     };
 
-    const cpmTable = {
+const cpmTable = {
 	1.0: 0.094, 
 	1.5: 0.135137, 
 	2.0: 0.166398, 
