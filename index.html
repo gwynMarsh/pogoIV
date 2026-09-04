@@ -218,9 +218,6 @@
         <span class="val" id="atk-val">15</span>
       </div>
       <input type="range" id="atk" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
-      <div class="slider-marks">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
     </div>
 
     <div class="slider-wrapper">
@@ -228,10 +225,7 @@
         <span>Defense IV</span>
         <span class="val" id="def-val">15</span>
       </div>
-      <input type="range" id="def" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">
-      <div class="slider-marks">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
+     <input type="range" id="def" min="0" max="15" step="1" value="15" list="iv-marks" oninput="updateVal('def'); calcAll()">
     </div>
 
     <div class="slider-wrapper">
@@ -239,10 +233,7 @@
         <span>HP IV</span>
         <span class="val" id="hp-val">15</span>
       </div>
-      <input type="range" id="hp" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">
-      <div class="slider-marks">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
+     <input type="range" id="hp" min="0" max="15" step="1" value="15" list="iv-marks" oninput="updateVal('hp'); calcAll()">
     </div>
   </div>
 
