@@ -184,7 +184,7 @@ const baseStatsDb = {
  "Dratini": [ 119, 91, 121 ],
  "Dragonair": [ 163, 135, 156 ],
  "Dragonite": [ 263, 198, 209 ],
- "Mewtwo (A)": [ 182, 278, 214 ],
+ "Mewtwo (Armored)": [ 182, 278, 214 ],
  "Mewtwo": [ 300, 182, 214 ],
  "Mew": [ 210, 210, 225 ],
  "Chikorita": [ 92, 122, 128 ],
