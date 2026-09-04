@@ -15,17 +15,25 @@
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #444; }
     .slider-header span.val { color: #38765B; font-size: 17px; }
     
-    input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; outline: none; }
+input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; outline: none; }
+    input[type=range]::-webkit-slider-runnable-track { height: 6px; background: #d1d1d6; border-radius: 3px; cursor: pointer; }
+    input[type=range]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: #fff; border: 1px solid #ccc; margin-top: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+
+    /* Hover effect for the thumb */
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
     
     .slider-marks { display: flex; justify-content: space-between; padding: 0 12px; margin-top: 8px; pointer-events: none; }
-    .slider-marks i { width: 2px; height: 2px; background: #aaa; border-radius: 50%; }
+    .slider-marks i { width: 1px; height: 3px; background: #aaa; border-radius: 50%; }
     
     .slider-marks i:nth-child(1),
     .slider-marks i:nth-child(6),
     .slider-marks i:nth-child(11),
     .slider-marks i:nth-child(16) {
       width: 3px;
-      height: 5px;
+      height: 6px;
       background: #555;
       border-radius: 2px;
     }
@@ -217,7 +225,9 @@
         <span>Attack IV</span>
         <span class="val" id="atk-val">15</span>
       </div>
-      <input type="range" id="atk" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
+<input type="range" id="atk" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">      <div class="slider-marks">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
     </div>
 
     <div class="slider-wrapper">
@@ -225,7 +235,9 @@
         <span>Defense IV</span>
         <span class="val" id="def-val">15</span>
       </div>
-     <input type="range" id="def" min="0" max="15" step="1" value="15" list="iv-marks" oninput="updateVal('def'); calcAll()">
+<input type="range" id="def" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">      <div class="slider-marks">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
     </div>
 
     <div class="slider-wrapper">
@@ -233,7 +245,9 @@
         <span>HP IV</span>
         <span class="val" id="hp-val">15</span>
       </div>
-     <input type="range" id="hp" min="0" max="15" step="1" value="15" list="iv-marks" oninput="updateVal('hp'); calcAll()">
+<input type="range" id="hp" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">      <div class="slider-marks">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
     </div>
   </div>
 
