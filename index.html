@@ -22,6 +22,8 @@ input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance
     /* Hover effect for the thumb */
     .slider::-webkit-slider-thumb:hover {
       transform: scale(1.1);
+      background-color: #facc15; /* Electric yellow */
+      border-color: #ca8a04;     /* A slightly darker gold border for contrast */
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
     
@@ -261,11 +263,11 @@ input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#FF6969" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#FFA703" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="atk-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #FF6969;">ATK</div>
+        <div class="stat-label" style="color: #FFA703;">ATK</div>
       </div>
 
       <!-- DEF Column -->
@@ -273,11 +275,11 @@ input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#86C8FC" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#03D9FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="def-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #86C8FC;">DEF</div>
+        <div class="stat-label" style="color: #03D9FF;">DEF</div>
       </div>
 
       <!-- HP Column -->
