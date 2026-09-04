@@ -32,7 +32,7 @@
       border-radius: 2px;
     }
 
-    /* Custom Desaturated Dark Teal Result Container */
+    /* Custom Result Container */
     .result-container {
       background-color: #333333;
       color: #ffffff;
@@ -98,7 +98,7 @@
 
   <script src="db.js"></script>
 
-  <script>
+ <script>
     let lowerCaseDb = {};
 
     window.onload = function() {
@@ -138,26 +138,29 @@
 
       const ivSum = atkIV + defIV + hpIV;
       const ivPercent = ((ivSum / 45) * 100).toFixed(2);
-
-      resMain.innerText = `${ivPercent}% IV`;
+      const ivString = `${ivPercent}% IV (${ivSum}/45)`;
 
       const maxArcLength = 47.12; // Half circle circumference for r=15
 
-      if (typeof baseStatsDb === 'undefined' || typeof cpmTable === 'undefined') {
-        resSub.innerText = "Error: db.js not found";
+      // Reset Function for Gauges
+      const resetGauges = () => {
         atkValEl.innerText = "-"; defValEl.innerText = "-"; hpValEl.innerText = "-";
         atkArc.style.strokeDashoffset = maxArcLength;
         defArc.style.strokeDashoffset = maxArcLength;
         hpArc.style.strokeDashoffset = maxArcLength;
+      };
+
+      if (typeof baseStatsDb === 'undefined' || typeof cpmTable === 'undefined') {
+        resMain.innerText = "Error";
+        resSub.innerText = "db.js not found";
+        resetGauges();
         return;
       }
 
       if (!nameInput || !cp || !lowerCaseDb[nameInput]) {
-        resSub.innerText = lowerCaseDb[nameInput] ? "Enter CP to find Level" : `${ivSum}/45 IV • Enter valid species for Level`;
-        atkValEl.innerText = "-"; defValEl.innerText = "-"; hpValEl.innerText = "-";
-        atkArc.style.strokeDashoffset = maxArcLength;
-        defArc.style.strokeDashoffset = maxArcLength;
-        hpArc.style.strokeDashoffset = maxArcLength;
+        resMain.innerText = "Level ?";
+        resSub.innerText = lowerCaseDb[nameInput] ? `${ivString} • Enter CP` : `${ivString} • Enter valid species`;
+        resetGauges();
         return;
       }
 
@@ -183,16 +186,17 @@
       const calculatedDef = Number((totalDef * selectedCPM).toFixed(1));
       const calculatedHp = Math.max(10, Math.floor(totalSta * selectedCPM));
 
-      resSub.innerText = `Level ${closestLevel} (${ivSum}/45 IV)`;
+      // Swapped Hierarchy Here
+      resMain.innerText = `Level ${closestLevel}`;
+      resSub.innerText = ivString;
       
       // Update Text Values
       atkValEl.innerText = calculatedAtk;
       defValEl.innerText = calculatedDef;
       hpValEl.innerText = calculatedHp;
 
-      // Update Gauge Arcs (Max stat reference scale set to 350 for gauge visualization)
+      // Update Gauge Arcs
       const statCap = 350;
-      
       const atkRatio = Math.min(1, calculatedAtk / statCap);
       const defRatio = Math.min(1, calculatedDef / statCap);
       const hpRatio = Math.min(1, calculatedHp / statCap);
@@ -244,45 +248,45 @@
     </div>
   </div>
 
-  <div class="result-container">
-    <div id="result-main" class="result-main">100.00% IV</div>
-    <div id="result-sub" class="result-sub">Enter Pokémon Name & CP</div>
+<div class="result-container">
+    <div id="result-main" class="result-main">Level ?</div>
+    <div id="result-sub" class="result-sub">100.00% IV (45/45) • Enter Name & CP</div>
     
     <div class="result-stats">
-      <!-- ATK Column (Cool Blue/Cyan) -->
+      <!-- ATK Column -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#FF4040" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="atk-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #38bdf8;">ATK</div>
+        <div class="stat-label" style="color: #FF4040;">ATK</div>
       </div>
 
-      <!-- DEF Column (Muted Lime/Green) -->
+      <!-- DEF Column -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#a3e635" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#86C8FC" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="def-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #a3e635;">DEF</div>
+        <div class="stat-label" style="color: #86C8FC;">DEF</div>
       </div>
 
-      <!-- HP Column (Teal / Mint) -->
+      <!-- HP Column -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#8DED5F" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="hp-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #2dd4bf;">HP</div>
+        <div class="stat-label" style="color: #8DED5F;">HP</div>
       </div>
     </div>
   </div>
