@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Pokémon GO Evaluator</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px 16px; max-width: 360px; margin: 0 auto; text-align: center; background-color: #f4f4f7; color: #333; -webkit-tap-highlight-color: transparent; }
+  body { 
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+  padding: 20px 16px; 
+  max-width: 360px; 
+  margin: 0 auto; 
+  text-align: center; 
+  background-color: #f4f4f7; 
+  color: #333; 
+  -webkit-tap-highlight-color: transparent; 
+  }    
     h2 { margin-bottom: 24px; font-size: 22px; }
     
     .input-group { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 20px; text-align: left; }
@@ -15,7 +27,7 @@
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #444; }
     .slider-header span.val { color: #38765B; font-size: 17px; }
     
-input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; outline: none; }
+  input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; outline: none; }
     input[type=range]::-webkit-slider-runnable-track { height: 6px; background: #d1d1d6; border-radius: 3px; cursor: pointer; }
     input[type=range]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: #fff; border: 1px solid #ccc; margin-top: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
 
