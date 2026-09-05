@@ -1,57 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Pokémon GO Evaluator</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+
   <style>
-  body { 
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-  padding: 20px 16px; 
-  max-width: 360px; 
-  margin: 0 auto; 
-  text-align: center; 
-  background-color: #f4f4f7; 
-  color: #333; 
-  -webkit-tap-highlight-color: transparent; 
-  }    
-    h2 { margin-bottom: 24px; font-size: 22px; }
+    /* Theme Variables */
+    :root {
+      --bg-color: #f4f4f7;
+      --text-color: #333;
+      --input-bg: #fff;
+      --input-border: #ccc;
+      --slider-text: #444;
+      --track-color: #d1d1d6;
+      --mark-color: #aaa;
+      --mark-accent: #555;
+    }
     
-  .input-group { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 20px; text-align: left; }
-    input[type="text"], 
-    input[type="number"] { 
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    width: 100%; 
-    padding: 14px 12px; 
-    font-size: 18px; 
-    box-sizing: border-box; 
-    border: 1.5px solid #ccc; 
-    border-radius: 12px; 
-    text-align: center; 
-    background: #fff; 
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #f3f4f6;
+      --input-bg: #1f2937;
+      --input-border: #374151;
+      --slider-text: #d1d5db;
+      --track-color: #4b5563;
+      --mark-color: #555;
+      --mark-accent: #aaa;
+    }
+
+    body { 
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      padding: 20px 16px; 
+      max-width: 360px; 
+      margin: 0 auto; 
+      text-align: center; 
+      background-color: var(--bg-color); 
+      color: var(--text-color); 
+      -webkit-tap-highlight-color: transparent; 
+      transition: background-color 0.3s ease, color 0.3s ease;
     } 
     
+    /* Header & Toggle Button Layout */
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    h2 { margin: 0; font-size: 22px; }
+    
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 32px; /* Made the moon/sun icon bigger! */
+      cursor: pointer;
+      padding: 4px;
+    }
+    
+    .input-group { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 20px; text-align: left; }
+    
+    input[type="text"], 
+    input[type="number"] { 
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      width: 100%; 
+      padding: 14px 12px; 
+      font-size: 18px; 
+      box-sizing: border-box; 
+      border: 1.5px solid var(--input-border); 
+      border-radius: 12px; 
+      text-align: center; 
+      background: var(--input-bg); 
+      color: var(--text-color);
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+    } 
+
+    /* Added extra padding below CP specifically */
+    .cp-input {
+      margin-bottom: 16px; 
+    }
+    
     .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
-    .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #444; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
     .slider-header span.val { color: #38765B; font-size: 17px; }
     
     input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; outline: none; }
-    input[type=range]::-webkit-slider-runnable-track { height: 6px; background: #d1d1d6; border-radius: 3px; cursor: pointer; }
+    input[type=range]::-webkit-slider-runnable-track { height: 6px; background: var(--track-color); border-radius: 3px; cursor: pointer; }
     input[type=range]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: #fff; border: 1px solid #ccc; margin-top: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
 
     /* Hover effect for the thumb */
     .slider::-webkit-slider-thumb:hover {
       transform: scale(1.1);
-      background-color: #facc15; /* Electric yellow */
-      border-color: #ca8a04;     /* A slightly darker gold border for contrast */
+      background-color: #facc15; 
+      border-color: #ca8a04;     
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
     
     .slider-marks { display: flex; justify-content: space-between; padding: 0 12px; margin-top: 8px; pointer-events: none; }
-    .slider-marks i { width: 1px; height: 3px; background: #aaa; border-radius: 50%; }
+    .slider-marks i { width: 1px; height: 3px; background: var(--mark-color); border-radius: 50%; }
     
     .slider-marks i:nth-child(1),
     .slider-marks i:nth-child(6),
@@ -59,7 +109,7 @@
     .slider-marks i:nth-child(16) {
       width: 3px;
       height: 6px;
-      background: #555;
+      background: var(--mark-accent);
       border-radius: 2px;
     }
 
@@ -129,10 +179,24 @@
 
   <script src="db.js"></script>
 
- <script>
+  <script>
     let lowerCaseDb = {};
 
+    // Handles the Dark/Light mode swapping
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      document.getElementById('theme-btn').innerText = isDark ? '☀️' : '🌙';
+      localStorage.setItem('app-theme', isDark ? 'dark' : 'light');
+    }
+
     window.onload = function() {
+      // Check saved theme on load
+      if (localStorage.getItem('app-theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-btn').innerText = '☀️';
+      }
+
       const datalist = document.getElementById("pokemon-list");
       if (typeof baseStatsDb !== 'undefined') {
         Object.keys(baseStatsDb).forEach(name => {
@@ -171,9 +235,8 @@
       const ivPercent = ((ivSum / 45) * 100).toFixed(2);
       const ivString = `${ivPercent}% IV (${ivSum}/45)`;
 
-      const maxArcLength = 47.12; // Half circle circumference for r=15
+      const maxArcLength = 47.12; 
 
-      // Reset Function for Gauges
       const resetGauges = () => {
         atkValEl.innerText = "-"; defValEl.innerText = "-"; hpValEl.innerText = "-";
         atkArc.style.strokeDashoffset = maxArcLength;
@@ -199,7 +262,7 @@
       const totalAtk = base[0] + atkIV;
       const totalDef = base[1] + defIV;
       const totalSta = base[2] + hpIV;
-
+      
       const targetCPM = Math.sqrt((10 * cp) / (totalAtk * Math.sqrt(totalDef) * Math.sqrt(totalSta)));
 
       let closestLevel = 1.0;
@@ -217,16 +280,13 @@
       const calculatedDef = Number((totalDef * selectedCPM).toFixed(1));
       const calculatedHp = Math.max(10, Math.floor(totalSta * selectedCPM));
 
-      // Swapped Hierarchy Here
       resMain.innerText = `Level ${closestLevel}`;
       resSub.innerText = ivString;
       
-      // Update Text Values
       atkValEl.innerText = calculatedAtk;
       defValEl.innerText = calculatedDef;
       hpValEl.innerText = calculatedHp;
 
-      // Update Gauge Arcs
       const statCap = 350;
       const atkRatio = Math.min(1, calculatedAtk / statCap);
       const defRatio = Math.min(1, calculatedDef / statCap);
@@ -239,21 +299,23 @@
   </script>
 </head>
 <body>
-<div class="header-row">
+  <div class="header-row">
     <h2>Pokémon Evaluator</h2>
     <button id="theme-btn" class="theme-toggle" onclick="toggleTheme()">🌙</button>
-</div>
+  </div>
+  
   <div class="input-group">
     <input id="name" type="text" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" oninput="calcAll()">
     <datalist id="pokemon-list"></datalist>
-    <input id="cp" type="number" inputmode="numeric" placeholder="CP" autocomplete="off" oninput="calcAll()">
+    <input id="cp" class="cp-input" type="number" inputmode="numeric" placeholder="CP" autocomplete="off" oninput="calcAll()">
     
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Attack IV</span>
         <span class="val" id="atk-val">15</span>
       </div>
-<input type="range" id="atk" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">      <div class="slider-marks">
+      <input type="range" id="atk" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
+      <div class="slider-marks">
         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
       </div>
     </div>
@@ -263,7 +325,8 @@
         <span>Defense IV</span>
         <span class="val" id="def-val">15</span>
       </div>
-<input type="range" id="def" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">      <div class="slider-marks">
+      <input type="range" id="def" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">
+      <div class="slider-marks">
         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
       </div>
     </div>
@@ -273,51 +336,49 @@
         <span>HP IV</span>
         <span class="val" id="hp-val">15</span>
       </div>
-<input type="range" id="hp" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">      <div class="slider-marks">
+      <input type="range" id="hp" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">
+      <div class="slider-marks">
         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
       </div>
     </div>
   </div>
 
-<div class="result-container">
+  <div class="result-container">
     <div id="result-main" class="result-main">Level ?</div>
     <div id="result-sub" class="result-sub">100.00% IV (45/45) • Enter Name & CP</div>
     
     <div class="result-stats">
-      <!-- ATK Column -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#FFA703" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="atk-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #FFA703;">ATK</div>
+        <div class="stat-label" style="color: #38bdf8;">ATK</div>
       </div>
 
-      <!-- DEF Column -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#03D9FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#a3e635" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="def-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #03D9FF;">DEF</div>
+        <div class="stat-label" style="color: #a3e635;">DEF</div>
       </div>
 
-      <!-- HP Column -->
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#8DED5F" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val" id="hp-val-text">-</div>
         </div>
-        <div class="stat-label" style="color: #8DED5F;">HP</div>
+        <div class="stat-label" style="color: #2dd4bf;">HP</div>
       </div>
     </div>
   </div>
