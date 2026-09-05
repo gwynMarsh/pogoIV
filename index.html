@@ -239,7 +239,10 @@
   </script>
 </head>
 <body>
-  <h2>Pokémon Evaluator</h2>
+<div class="header-row">
+    <h2>Pokémon Evaluator</h2>
+    <button id="theme-btn" class="theme-toggle" onclick="toggleTheme()">🌙</button>
+</div>
   <div class="input-group">
     <input id="name" type="text" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" oninput="calcAll()">
     <datalist id="pokemon-list"></datalist>
