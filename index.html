@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 
   <style>
-    /* Theme Variables */
+  /* Theme Variables */
     :root {
       --bg-color: #f4f4f7;
       --text-color: #333;
@@ -20,6 +20,9 @@
       --track-color: #d1d1d6;
       --mark-color: #aaa;
       --mark-accent: #555;
+      /* New Light Mode Result Box Colors */
+      --result-bg: #2a4038; 
+      --result-shadow: rgba(42, 64, 56, 0.3);
     }
     
     body.dark-mode {
@@ -31,8 +34,11 @@
       --track-color: #4b5563;
       --mark-color: #555;
       --mark-accent: #aaa;
+      /* New Dark Mode Result Box Colors */
+      --result-bg: #172621; 
+      --result-shadow: rgba(0, 0, 0, 0.5);
     }
-
+    
     body { 
       font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
       padding: 20px 16px; 
@@ -113,14 +119,15 @@
       border-radius: 2px;
     }
 
-    /* Custom Result Container */
+/* Custom Result Container */
     .result-container {
-      background-color: #333333;
+      background-color: var(--result-bg);
       color: #ffffff;
       border-radius: 20px;
       padding: 18px 16px;
       margin-top: 20px;
-      box-shadow: 0 4px 12px rgba(27, 51, 45, 0.3);
+      box-shadow: 0 4px 12px var(--result-shadow);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
     .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
     .result-sub { font-size: 15px; color: #BFBFBF; margin-top: 6px; }
