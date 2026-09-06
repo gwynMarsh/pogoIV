@@ -328,15 +328,15 @@ body.dark-mode {
       // Calculate star emojis based on standard Pokémon GO appraisal thresholds
       let starsDisplay = "—";
       if (ivSum === 45) {
-        starsDisplay = "⭐⭐⭐⭐ (4*)";
+        starsDisplay = "★★★★";
       } else if (ivSum >= 37) {
-        starsDisplay = "⭐⭐⭐ (3*)";
+        starsDisplay = "★★★☆";
       } else if (ivSum >= 30) {
-        starsDisplay = "⭐⭐ (2*)";
+        starsDisplay = "★★☆☆";
       } else if (ivSum >= 23) {
-        starsDisplay = "⭐ (1*)";
+        starsDisplay = "★☆☆☆";
       } else {
-        starsDisplay = "0*";
+        starsDisplay = "☆☆☆☆";
       }
 
       const resetGauges = () => {
@@ -444,11 +444,11 @@ body.dark-mode {
   </div>
 
   <div class="result-container">
-    <div id="result-main" class="result-main">Level ?</div>
+    <div id="result-main" class="result-main">Level ???</div>
     <div id="result-stars" class="result-stars">—</div>
     <div id="result-sub" class="result-sub">100.00% IV (45/45) • Enter Name & CP</div>
     
-    <div class="result-stats">
+    <div class="result-stats"> 
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
