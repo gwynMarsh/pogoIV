@@ -90,28 +90,51 @@ body.dark-mode {
     .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
     
-    /* iOS Rolling Number CSS for Sliders */
-    .val-container {
+    /* --------------------------------- */
+    /* NEW DIGIT-BY-DIGIT ROLLER ENGINE  */
+    /* --------------------------------- */
+    .digit-roller {
       display: inline-flex;
-      height: 20px; 
-      overflow: hidden; 
       justify-content: flex-end;
-      min-width: 22px;
+      align-items: center;
+      /* tabular-nums stops columns from jittering sideways when numbers change width */
+      font-variant-numeric: tabular-nums; 
     }
-    .val-strip {
+    .digit-col {
+      overflow: hidden;
+      display: inline-block;
+    }
+    .digit-strip {
       display: flex;
       flex-direction: column;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.35, 1);
-      color: var(--val-color);
-      font-size: 18px;
-      line-height: 20px;
     }
-    .val-strip div {
-      height: 20px;
+    .digit-strip > div {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: center;
+      line-height: 1;
     }
+
+    /* Slider specific roller styling */
+    .slider-header .digit-roller {
+      height: 20px;
+      color: var(--val-color);
+      font-size: 18px;
+    }
+
+    /* Gauge specific roller styling */
+    .gauge-val-container {
+      z-index: 2;
+      margin-bottom: 2px;
+    }
+    .gauge-val-container .digit-roller {
+      height: 15px;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    
+    /* --------------------------------- */
     
     input[type=range] { 
       width: 100%; 
@@ -187,32 +210,6 @@ body.dark-mode {
     }
     .gauge-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     
-    /* iOS Rolling Number CSS specifically for Gauges */
-    .gauge-val-container {
-      display: inline-flex;
-      height: 15px; /* Fixed height matching the font size */
-      overflow: hidden;
-      justify-content: center;
-      min-width: 40px;
-      z-index: 2;
-      margin-bottom: 2px;
-    }
-    .gauge-val-strip {
-      display: flex;
-      flex-direction: column;
-      font-size: 15px;
-      font-weight: 700;
-      color: #ffffff;
-      line-height: 15px;
-      text-align: center;
-    }
-    .gauge-val-strip div {
-      height: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
     .stat-label { 
       font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; 
     }
@@ -247,53 +244,78 @@ body.dark-mode {
       }
       
       // Initialize Sliders
-      ['atk', 'def', 'hp'].forEach(id => {
-        const strip = document.getElementById(id + '-val-strip');
-        for (let i = 0; i <= 15; i++) {
-          const numDiv = document.createElement('div');
-          numDiv.innerText = i;
-          strip.appendChild(numDiv);
-        }
-        updateVal(id); 
-      });
+      ['atk', 'def', 'hp'].forEach(id => updateVal(id));
       calcAll();
     };
 
+    // Main Engine to roll digits independently
+    function updateDigitRoll(containerId, newValue, height) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      const currentValStr = container.dataset.val || "";
+      const newValStr = String(newValue);
+
+      // Skip if value hasn't changed
+      if (currentValStr === newValStr) return;
+
+      // If the number of digits changes (e.g. 9 -> 10), instantly rebuild the columns
+      if (currentValStr.length !== newValStr.length) {
+        container.innerHTML = '';
+        for (let char of newValStr) {
+          const col = document.createElement('div');
+          col.className = 'digit-col';
+          col.style.height = height + 'px';
+
+          const strip = document.createElement('div');
+          strip.className = 'digit-strip';
+          strip.innerHTML = `<div style="height: ${height}px">${char}</div>`;
+
+          col.appendChild(strip);
+          container.appendChild(col);
+        }
+      } else {
+        // Number of digits is the same. Animate ONLY the columns where the digit actually changed.
+        const strips = container.querySelectorAll('.digit-strip');
+        for (let i = 0; i < newValStr.length; i++) {
+          if (currentValStr[i] !== newValStr[i]) {
+            const strip = strips[i];
+            
+            // Turn off transition to snap to starting position
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateY(0)';
+            
+            // Load the old digit on top, new digit on bottom
+            strip.innerHTML = `
+              <div style="height: ${height}px">${currentValStr[i]}</div>
+              <div style="height: ${height}px">${newValStr[i]}</div>
+            `;
+            
+            // Force browser to acknowledge the instant reset before animating
+            void strip.offsetHeight; 
+            
+            // Turn transition back on and slide down to the new digit
+            strip.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.35, 1)';
+            strip.style.transform = `translateY(-${height}px)`;
+          }
+        }
+      }
+      
+      // Store the new value state
+      container.dataset.val = newValStr;
+    }
+
     function updateVal(id) {
       const slider = document.getElementById(id);
-      const strip = document.getElementById(id + "-val-strip");
       const val = parseInt(slider.value, 10);
       
       const min = parseInt(slider.min, 10) || 0;
       const max = parseInt(slider.max, 10) || 15;
       const percent = ((val - min) / (max - min)) * 100;
       slider.style.setProperty('--percent', `${percent}%`);
-      strip.style.transform = `translateY(-${val * 20}px)`;
-    }
-
-    // Dynamic 2-number roll for gauges
-    function updateGaugeRoll(stripId, newValue) {
-      const strip = document.getElementById(stripId);
-      if (!strip) return;
       
-      const currentVal = strip.dataset.val || "-";
-      if (currentVal === String(newValue)) return;
-      
-      strip.dataset.val = newValue;
-      
-      // Disable transition and snap back to the start
-      strip.style.transition = 'none';
-      strip.style.transform = 'translateY(0)';
-      
-      // Inject only the old value and the newly calculated value
-      strip.innerHTML = `<div>${currentVal}</div><div>${newValue}</div>`;
-      
-      // Force browser reflow so the zero-position takes effect instantly
-      void strip.offsetHeight;
-      
-      // Turn on the transition and slide down to the new value (15px height)
-      strip.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.35, 1)';
-      strip.style.transform = 'translateY(-15px)';
+      // Update slider number using the roller (20px height)
+      updateDigitRoll(id + '-val-roller', val, 20);
     }
 
     function calcAll() {
@@ -316,9 +338,9 @@ body.dark-mode {
       const maxArcLength = 47.12; 
 
       const resetGauges = () => {
-        updateGaugeRoll('atk-gauge-strip', '-');
-        updateGaugeRoll('def-gauge-strip', '-');
-        updateGaugeRoll('hp-gauge-strip', '-');
+        updateDigitRoll('atk-gauge-roller', '-', 15);
+        updateDigitRoll('def-gauge-roller', '-', 15);
+        updateDigitRoll('hp-gauge-roller', '-', 15);
         atkArc.style.strokeDashoffset = maxArcLength;
         defArc.style.strokeDashoffset = maxArcLength;
         hpArc.style.strokeDashoffset = maxArcLength;
@@ -362,10 +384,10 @@ body.dark-mode {
       resMain.innerText = `Level ${closestLevel}`;
       resSub.innerText = ivString;
       
-      // Update the gauges using the new rolling function
-      updateGaugeRoll('atk-gauge-strip', calculatedAtk);
-      updateGaugeRoll('def-gauge-strip', calculatedDef);
-      updateGaugeRoll('hp-gauge-strip', calculatedHp);
+      // Update the gauge numbers using the roller (15px height)
+      updateDigitRoll('atk-gauge-roller', calculatedAtk, 15);
+      updateDigitRoll('def-gauge-roller', calculatedDef, 15);
+      updateDigitRoll('hp-gauge-roller', calculatedHp, 15);
 
       const statCap = 350;
       const atkRatio = Math.min(1, calculatedAtk / statCap);
@@ -392,7 +414,7 @@ body.dark-mode {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Attack IV</span>
-        <div class="val-container"><div class="val-strip" id="atk-val-strip"></div></div>
+        <div class="digit-roller" id="atk-val-roller"></div>
       </div>
       <input type="range" id="atk" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
       <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -401,7 +423,7 @@ body.dark-mode {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Defense IV</span>
-        <div class="val-container"><div class="val-strip" id="def-val-strip"></div></div>
+        <div class="digit-roller" id="def-val-roller"></div>
       </div>
       <input type="range" id="def" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">
       <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -410,7 +432,7 @@ body.dark-mode {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>HP IV</span>
-        <div class="val-container"><div class="val-strip" id="hp-val-strip"></div></div>
+        <div class="digit-roller" id="hp-val-roller"></div>
       </div>
       <input type="range" id="hp" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">
       <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -429,7 +451,7 @@ body.dark-mode {
             <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#FF5252" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val-container">
-            <div class="gauge-val-strip" id="atk-gauge-strip"><div>-</div></div>
+            <div class="digit-roller" id="atk-gauge-roller"></div>
           </div>
         </div>
         <div class="stat-label" style="color: #FF5252;">ATK</div>
@@ -442,7 +464,7 @@ body.dark-mode {
             <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#4DF1FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val-container">
-            <div class="gauge-val-strip" id="def-gauge-strip"><div>-</div></div>
+            <div class="digit-roller" id="def-gauge-roller"></div>
           </div>
         </div>
         <div class="stat-label" style="color: #4DF1FF;">DEF</div>
@@ -455,7 +477,7 @@ body.dark-mode {
             <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#5CFF40" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
           <div class="gauge-val-container">
-            <div class="gauge-val-strip" id="hp-gauge-strip"><div>-</div></div>
+            <div class="digit-roller" id="hp-gauge-roller"></div>
           </div>
         </div>
         <div class="stat-label" style="color: #5CFF40;">HP</div>
