@@ -19,9 +19,7 @@
   --track-color: #d1d1d6;
   --mark-color: #aaa;
   --mark-accent: #555;
-  /* Light Mode slider value color */
-   --val-color: #DE7E00; 
-  /* Light Mode Result Box */
+  --val-color: #DE7E00; 
   --result-bg: #242424; 
   --result-border: transparent;
   --result-shadow: rgba(0, 0, 0, 0.25);
@@ -36,14 +34,11 @@ body.dark-mode {
   --track-color: #4b5563;
   --mark-color: #555;
   --mark-accent: #aaa;
-  /* Dark Mode slider value color */
   --val-color: #FF9D2E; 
-  /* Dark Mode Pure Black */
   --result-bg: #000000; 
   --result-border: 1px solid #2d2d2d;
   --result-shadow: rgba(0, 0, 0, 0.6); 
-
-    }
+}
     
     body { 
       font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
@@ -98,18 +93,31 @@ body.dark-mode {
     .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
     
-    .slider-header span.val { 
-      color: var(--val-color); 
-      font-size: 17px; 
-      display: inline-block; /* Required for transform scale to work properly */
-      transition: color 0.3s ease, transform 0.15s ease-out;
+    /* iOS Rolling Number CSS */
+    .val-container {
+      display: inline-flex;
+      height: 20px; /* strict height matching line-height */
+      overflow: hidden; /* hides numbers outside this box */
+      justify-content: flex-end;
+      min-width: 22px;
     }
-    /* Value animation state */
-    .slider-header span.val.animating {
-      transform: scale(1.35);
+    .val-strip {
+      display: flex;
+      flex-direction: column;
+      /* cubic-bezier gives it that slight bouncy/smooth iOS deceleration */
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.35, 1);
+      color: var(--val-color);
+      font-size: 18px;
+      line-height: 20px;
+    }
+    .val-strip div {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
     }
     
-    /* Updated Slider Input for Gradient Track Fill */
+    /* Slider Input for Gradient Track Fill */
     input[type=range] { 
       width: 100%; 
       margin: 0; 
@@ -124,7 +132,7 @@ body.dark-mode {
     
     input[type=range]::-webkit-slider-runnable-track { 
       height: 6px; 
-      background: transparent; /* Background handled by input to allow gradient fill */
+      background: transparent; 
       border-radius: 3px; 
       cursor: pointer; 
     }
@@ -137,7 +145,7 @@ body.dark-mode {
       border-radius: 50%; 
       background: #fff; 
       border: 1px solid #ccc; 
-      margin-top: -10px; /* Align correctly with the track */
+      margin-top: -10px; 
       box-shadow: 0 2px 5px rgba(0,0,0,0.25); 
       cursor: pointer; 
       transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; 
@@ -235,9 +243,7 @@ body.dark-mode {
 
   <script>
     let lowerCaseDb = {};
-    const animationTimeouts = {}; // Object to track timeouts for individual slider animations
 
-    // Handles the Dark/Light mode swapping
     function toggleTheme() {
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
@@ -246,7 +252,6 @@ body.dark-mode {
     }
 
     window.onload = function() {
-      // Check saved theme on load
       if (localStorage.getItem('app-theme') === 'dark') {
         document.body.classList.add('dark-mode');
         document.getElementById('theme-btn').innerText = '☀️';
@@ -262,38 +267,33 @@ body.dark-mode {
         });
       }
       
-      // Initialize slider visual fills based on default values
+      // Build the vertical strips of numbers (0 to 15) for the iOS effect
       ['atk', 'def', 'hp'].forEach(id => {
-          updateVal(id, true); // Pass 'true' to avoid initial animation jump on load
+        const strip = document.getElementById(id + '-val-strip');
+        for (let i = 0; i <= 15; i++) {
+          const numDiv = document.createElement('div');
+          numDiv.innerText = i;
+          strip.appendChild(numDiv);
+        }
+        updateVal(id); 
       });
       calcAll();
     };
 
-    // Updated function for Slider Value + Animation + Track Fill
-    function updateVal(id, isInit = false) {
+    // Updates slider fill and moves the iOS rolling number strip
+    function updateVal(id) {
       const slider = document.getElementById(id);
-      const valDisplay = document.getElementById(id + "-val");
-      const val = slider.value;
+      const strip = document.getElementById(id + "-val-strip");
+      const val = parseInt(slider.value, 10);
       
       // Calculate and apply fill percentage
-      const min = slider.min || 0;
-      const max = slider.max || 15;
+      const min = parseInt(slider.min, 10) || 0;
+      const max = parseInt(slider.max, 10) || 15;
       const percent = ((val - min) / (max - min)) * 100;
       slider.style.setProperty('--percent', `${percent}%`);
       
-      // Update text
-      valDisplay.innerText = val;
-
-      if (!isInit) {
-          // Trigger CSS animation class
-          valDisplay.classList.add('animating');
-          
-          // Clear any existing timeout for this specific slider to avoid clipping
-          clearTimeout(animationTimeouts[id]);
-          animationTimeouts[id] = setTimeout(() => {
-            valDisplay.classList.remove('animating');
-          }, 150);
-      }
+      // Move the strip up/down by multiplying value by line-height (20px)
+      strip.style.transform = `translateY(-${val * 20}px)`;
     }
 
     function calcAll() {
@@ -395,7 +395,10 @@ body.dark-mode {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Attack IV</span>
-        <span class="val" id="atk-val">15</span>
+        <!-- iOS rolling number container -->
+        <div class="val-container">
+          <div class="val-strip" id="atk-val-strip"></div>
+        </div>
       </div>
       <input type="range" id="atk" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
       <div class="slider-marks">
@@ -406,7 +409,10 @@ body.dark-mode {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Defense IV</span>
-        <span class="val" id="def-val">15</span>
+        <!-- iOS rolling number container -->
+        <div class="val-container">
+          <div class="val-strip" id="def-val-strip"></div>
+        </div>
       </div>
       <input type="range" id="def" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">
       <div class="slider-marks">
@@ -417,7 +423,10 @@ body.dark-mode {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>HP IV</span>
-        <span class="val" id="hp-val">15</span>
+        <!-- iOS rolling number container -->
+        <div class="val-container">
+          <div class="val-strip" id="hp-val-strip"></div>
+        </div>
       </div>
       <input type="range" id="hp" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">
       <div class="slider-marks">
