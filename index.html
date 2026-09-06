@@ -52,7 +52,6 @@ body.dark-mode {
       transition: background-color 0.3s ease, color 0.3s ease;
     } 
     
-    /* Header & Toggle Button Layout */
     .header-row {
       display: flex;
       justify-content: space-between;
@@ -86,25 +85,22 @@ body.dark-mode {
       transition: background 0.3s, border-color 0.3s, color 0.3s;
     } 
 
-    .cp-input {
-      margin-bottom: 16px; 
-    }
+    .cp-input { margin-bottom: 16px; }
     
     .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
     
-    /* iOS Rolling Number CSS */
+    /* iOS Rolling Number CSS for Sliders */
     .val-container {
       display: inline-flex;
-      height: 20px; /* strict height matching line-height */
-      overflow: hidden; /* hides numbers outside this box */
+      height: 20px; 
+      overflow: hidden; 
       justify-content: flex-end;
       min-width: 22px;
     }
     .val-strip {
       display: flex;
       flex-direction: column;
-      /* cubic-bezier gives it that slight bouncy/smooth iOS deceleration */
       transition: transform 0.3s cubic-bezier(0.25, 1, 0.35, 1);
       color: var(--val-color);
       font-size: 18px;
@@ -117,7 +113,6 @@ body.dark-mode {
       justify-content: flex-end;
     }
     
-    /* Slider Input for Gradient Track Fill */
     input[type=range] { 
       width: 100%; 
       margin: 0; 
@@ -129,14 +124,12 @@ body.dark-mode {
       outline: none; 
       transition: background 0.3s ease;
     }
-    
     input[type=range]::-webkit-slider-runnable-track { 
       height: 6px; 
       background: transparent; 
       border-radius: 3px; 
       cursor: pointer; 
     }
-    
     input[type=range]::-webkit-slider-thumb { 
       appearance: none; 
       -webkit-appearance: none; 
@@ -150,8 +143,6 @@ body.dark-mode {
       cursor: pointer; 
       transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; 
     }
-
-    /* Hover effect for the thumb */
     .slider::-webkit-slider-thumb:hover {
       transform: scale(1.1);
       background-color: #facc15; 
@@ -161,81 +152,69 @@ body.dark-mode {
     
     .slider-marks { display: flex; justify-content: space-between; padding: 0 12px; margin-top: 8px; pointer-events: none; }
     .slider-marks i { width: 1px; height: 3px; background: var(--mark-color); border-radius: 50%; }
-    
     .slider-marks i:nth-child(1),
     .slider-marks i:nth-child(6),
     .slider-marks i:nth-child(11),
     .slider-marks i:nth-child(16) {
-      width: 3px;
-      height: 6px;
-      background: var(--mark-accent);
-      border-radius: 2px;
+      width: 3px; height: 6px; background: var(--mark-accent); border-radius: 2px;
     }
 
-/* Custom Result Container */
-.result-container {
-  background-color: var(--result-bg) !important;
-  border: var(--result-border);
-  color: #ffffff;
-  border-radius: 20px;
-  padding: 18px 16px;
-  margin-top: 20px;
-  box-shadow: 0 4px 12px var(--result-shadow);
-  transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    .result-container {
+      background-color: var(--result-bg) !important;
+      border: var(--result-border);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 18px 16px;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px var(--result-shadow);
+      transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
     }
-
     .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
     .result-sub { font-size: 15px; color: #BFBFBF; margin-top: 6px; }
     
-    /* 3-Column Layout with Vertical Dividers and Gauges */
     .result-stats { 
-      display: flex; 
-      justify-content: space-evenly; 
-      margin-top: 14px; 
-      padding-top: 14px; 
-      border-top: 1px solid rgba(255, 255, 255, 0.15); 
+      display: flex; justify-content: space-evenly; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.15); 
     }
     .stat-col { 
-      flex: 1; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      position: relative;
+      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
     }
     .stat-col:not(:last-child) {
       border-right: 1px solid rgba(255, 255, 255, 0.15);
     }
     
-    /* Gauge Styles */
     .gauge-box {
-      position: relative;
-      width: 72px;
-      height: 42px;
-      display: flex;
-      align-items: flex-end;
+      position: relative; width: 72px; height: 42px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 2px;
+    }
+    .gauge-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    
+    /* iOS Rolling Number CSS specifically for Gauges */
+    .gauge-val-container {
+      display: inline-flex;
+      height: 15px; /* Fixed height matching the font size */
+      overflow: hidden;
       justify-content: center;
+      min-width: 40px;
+      z-index: 2;
       margin-bottom: 2px;
     }
-    .gauge-svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    .gauge-val {
+    .gauge-val-strip {
+      display: flex;
+      flex-direction: column;
       font-size: 15px;
       font-weight: 700;
       color: #ffffff;
-      z-index: 2;
-      line-height: 1;
-      margin-bottom: 2px;
+      line-height: 15px;
+      text-align: center;
     }
+    .gauge-val-strip div {
+      height: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
     .stat-label { 
-      font-size: 11px; 
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-top: 2px; 
+      font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; 
     }
   </style>
 
@@ -267,7 +246,7 @@ body.dark-mode {
         });
       }
       
-      // Build the vertical strips of numbers (0 to 15) for the iOS effect
+      // Initialize Sliders
       ['atk', 'def', 'hp'].forEach(id => {
         const strip = document.getElementById(id + '-val-strip');
         for (let i = 0; i <= 15; i++) {
@@ -280,29 +259,46 @@ body.dark-mode {
       calcAll();
     };
 
-    // Updates slider fill and moves the iOS rolling number strip
     function updateVal(id) {
       const slider = document.getElementById(id);
       const strip = document.getElementById(id + "-val-strip");
       const val = parseInt(slider.value, 10);
       
-      // Calculate and apply fill percentage
       const min = parseInt(slider.min, 10) || 0;
       const max = parseInt(slider.max, 10) || 15;
       const percent = ((val - min) / (max - min)) * 100;
       slider.style.setProperty('--percent', `${percent}%`);
-      
-      // Move the strip up/down by multiplying value by line-height (20px)
       strip.style.transform = `translateY(-${val * 20}px)`;
+    }
+
+    // Dynamic 2-number roll for gauges
+    function updateGaugeRoll(stripId, newValue) {
+      const strip = document.getElementById(stripId);
+      if (!strip) return;
+      
+      const currentVal = strip.dataset.val || "-";
+      if (currentVal === String(newValue)) return;
+      
+      strip.dataset.val = newValue;
+      
+      // Disable transition and snap back to the start
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateY(0)';
+      
+      // Inject only the old value and the newly calculated value
+      strip.innerHTML = `<div>${currentVal}</div><div>${newValue}</div>`;
+      
+      // Force browser reflow so the zero-position takes effect instantly
+      void strip.offsetHeight;
+      
+      // Turn on the transition and slide down to the new value (15px height)
+      strip.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.35, 1)';
+      strip.style.transform = 'translateY(-15px)';
     }
 
     function calcAll() {
       const resMain = document.getElementById("result-main");
       const resSub = document.getElementById("result-sub");
-      
-      const atkValEl = document.getElementById("atk-val-text");
-      const defValEl = document.getElementById("def-val-text");
-      const hpValEl = document.getElementById("hp-val-text");
       
       const atkArc = document.getElementById("atk-arc");
       const defArc = document.getElementById("def-arc");
@@ -317,11 +313,12 @@ body.dark-mode {
       const ivSum = atkIV + defIV + hpIV;
       const ivPercent = ((ivSum / 45) * 100).toFixed(2);
       const ivString = `${ivPercent}% IV (${ivSum}/45)`;
-
       const maxArcLength = 47.12; 
 
       const resetGauges = () => {
-        atkValEl.innerText = "-"; defValEl.innerText = "-"; hpValEl.innerText = "-";
+        updateGaugeRoll('atk-gauge-strip', '-');
+        updateGaugeRoll('def-gauge-strip', '-');
+        updateGaugeRoll('hp-gauge-strip', '-');
         atkArc.style.strokeDashoffset = maxArcLength;
         defArc.style.strokeDashoffset = maxArcLength;
         hpArc.style.strokeDashoffset = maxArcLength;
@@ -345,7 +342,6 @@ body.dark-mode {
       const totalAtk = base[0] + atkIV;
       const totalDef = base[1] + defIV;
       const totalSta = base[2] + hpIV;
-      
       const targetCPM = Math.sqrt((10 * cp) / (totalAtk * Math.sqrt(totalDef) * Math.sqrt(totalSta)));
 
       let closestLevel = 1.0;
@@ -366,9 +362,10 @@ body.dark-mode {
       resMain.innerText = `Level ${closestLevel}`;
       resSub.innerText = ivString;
       
-      atkValEl.innerText = calculatedAtk;
-      defValEl.innerText = calculatedDef;
-      hpValEl.innerText = calculatedHp;
+      // Update the gauges using the new rolling function
+      updateGaugeRoll('atk-gauge-strip', calculatedAtk);
+      updateGaugeRoll('def-gauge-strip', calculatedDef);
+      updateGaugeRoll('hp-gauge-strip', calculatedHp);
 
       const statCap = 350;
       const atkRatio = Math.min(1, calculatedAtk / statCap);
@@ -395,43 +392,28 @@ body.dark-mode {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Attack IV</span>
-        <!-- iOS rolling number container -->
-        <div class="val-container">
-          <div class="val-strip" id="atk-val-strip"></div>
-        </div>
+        <div class="val-container"><div class="val-strip" id="atk-val-strip"></div></div>
       </div>
       <input type="range" id="atk" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
-      <div class="slider-marks">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
+      <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
 
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>Defense IV</span>
-        <!-- iOS rolling number container -->
-        <div class="val-container">
-          <div class="val-strip" id="def-val-strip"></div>
-        </div>
+        <div class="val-container"><div class="val-strip" id="def-val-strip"></div></div>
       </div>
       <input type="range" id="def" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">
-      <div class="slider-marks">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
+      <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
 
     <div class="slider-wrapper">
       <div class="slider-header">
         <span>HP IV</span>
-        <!-- iOS rolling number container -->
-        <div class="val-container">
-          <div class="val-strip" id="hp-val-strip"></div>
-        </div>
+        <div class="val-container"><div class="val-strip" id="hp-val-strip"></div></div>
       </div>
       <input type="range" id="hp" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">
-      <div class="slider-marks">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
+      <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
   </div>
 
@@ -446,7 +428,9 @@ body.dark-mode {
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
             <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#FF5252" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
-          <div class="gauge-val" id="atk-val-text">-</div>
+          <div class="gauge-val-container">
+            <div class="gauge-val-strip" id="atk-gauge-strip"><div>-</div></div>
+          </div>
         </div>
         <div class="stat-label" style="color: #FF5252;">ATK</div>
       </div>
@@ -457,7 +441,9 @@ body.dark-mode {
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
             <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#4DF1FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
-          <div class="gauge-val" id="def-val-text">-</div>
+          <div class="gauge-val-container">
+            <div class="gauge-val-strip" id="def-gauge-strip"><div>-</div></div>
+          </div>
         </div>
         <div class="stat-label" style="color: #4DF1FF;">DEF</div>
       </div>
@@ -468,7 +454,9 @@ body.dark-mode {
             <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
             <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#5CFF40" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
           </svg>
-          <div class="gauge-val" id="hp-val-text">-</div>
+          <div class="gauge-val-container">
+            <div class="gauge-val-strip" id="hp-gauge-strip"><div>-</div></div>
+          </div>
         </div>
         <div class="stat-label" style="color: #5CFF40;">HP</div>
       </div>
