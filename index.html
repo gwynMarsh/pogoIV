@@ -69,7 +69,7 @@ body.dark-mode {
     .theme-toggle {
       background: none;
       border: none;
-      font-size: 32px; /* Made the moon/sun icon bigger! */
+      font-size: 32px; 
       cursor: pointer;
       padding: 4px;
     }
@@ -91,21 +91,57 @@ body.dark-mode {
       transition: background 0.3s, border-color 0.3s, color 0.3s;
     } 
 
-    /* Added extra padding below CP specifically */
     .cp-input {
       margin-bottom: 16px; 
     }
     
     .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
+    
     .slider-header span.val { 
       color: var(--val-color); 
       font-size: 17px; 
-      transition: color 0.3s ease;
-    }    
-    input[type=range] { width: 100%; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; outline: none; }
-    input[type=range]::-webkit-slider-runnable-track { height: 6px; background: var(--track-color); border-radius: 3px; cursor: pointer; }
-    input[type=range]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: #fff; border: 1px solid #ccc; margin-top: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+      display: inline-block; /* Required for transform scale to work properly */
+      transition: color 0.3s ease, transform 0.15s ease-out;
+    }
+    /* Value animation state */
+    .slider-header span.val.animating {
+      transform: scale(1.35);
+    }
+    
+    /* Updated Slider Input for Gradient Track Fill */
+    input[type=range] { 
+      width: 100%; 
+      margin: 0; 
+      appearance: none; 
+      -webkit-appearance: none; 
+      background: linear-gradient(to right, var(--val-color) var(--percent, 100%), var(--track-color) var(--percent, 100%)); 
+      height: 6px;
+      border-radius: 3px;
+      outline: none; 
+      transition: background 0.3s ease;
+    }
+    
+    input[type=range]::-webkit-slider-runnable-track { 
+      height: 6px; 
+      background: transparent; /* Background handled by input to allow gradient fill */
+      border-radius: 3px; 
+      cursor: pointer; 
+    }
+    
+    input[type=range]::-webkit-slider-thumb { 
+      appearance: none; 
+      -webkit-appearance: none; 
+      height: 26px; 
+      width: 26px; 
+      border-radius: 50%; 
+      background: #fff; 
+      border: 1px solid #ccc; 
+      margin-top: -10px; /* Align correctly with the track */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25); 
+      cursor: pointer; 
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; 
+    }
 
     /* Hover effect for the thumb */
     .slider::-webkit-slider-thumb:hover {
@@ -199,6 +235,7 @@ body.dark-mode {
 
   <script>
     let lowerCaseDb = {};
+    const animationTimeouts = {}; // Object to track timeouts for individual slider animations
 
     // Handles the Dark/Light mode swapping
     function toggleTheme() {
@@ -224,11 +261,39 @@ body.dark-mode {
           lowerCaseDb[name.toLowerCase()] = baseStatsDb[name];
         });
       }
+      
+      // Initialize slider visual fills based on default values
+      ['atk', 'def', 'hp'].forEach(id => {
+          updateVal(id, true); // Pass 'true' to avoid initial animation jump on load
+      });
       calcAll();
     };
 
-    function updateVal(id) {
-      document.getElementById(id + "-val").innerText = document.getElementById(id).value;
+    // Updated function for Slider Value + Animation + Track Fill
+    function updateVal(id, isInit = false) {
+      const slider = document.getElementById(id);
+      const valDisplay = document.getElementById(id + "-val");
+      const val = slider.value;
+      
+      // Calculate and apply fill percentage
+      const min = slider.min || 0;
+      const max = slider.max || 15;
+      const percent = ((val - min) / (max - min)) * 100;
+      slider.style.setProperty('--percent', `${percent}%`);
+      
+      // Update text
+      valDisplay.innerText = val;
+
+      if (!isInit) {
+          // Trigger CSS animation class
+          valDisplay.classList.add('animating');
+          
+          // Clear any existing timeout for this specific slider to avoid clipping
+          clearTimeout(animationTimeouts[id]);
+          animationTimeouts[id] = setTimeout(() => {
+            valDisplay.classList.remove('animating');
+          }, 150);
+      }
     }
 
     function calcAll() {
