@@ -91,13 +91,12 @@ body.dark-mode {
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
     
     /* --------------------------------- */
-    /* NEW DIGIT-BY-DIGIT ROLLER ENGINE  */
+    /* DIGIT-BY-DIGIT ROLLER ENGINE  */
     /* --------------------------------- */
     .digit-roller {
       display: inline-flex;
       justify-content: flex-end;
       align-items: center;
-      /* tabular-nums stops columns from jittering sideways when numbers change width */
       font-variant-numeric: tabular-nums; 
     }
     .digit-col {
@@ -115,14 +114,12 @@ body.dark-mode {
       line-height: 1;
     }
 
-    /* Slider specific roller styling */
     .slider-header .digit-roller {
       height: 20px;
       color: var(--val-color);
       font-size: 18px;
     }
 
-    /* Gauge specific roller styling */
     .gauge-val-container {
       z-index: 2;
       margin-bottom: 2px;
@@ -193,7 +190,8 @@ body.dark-mode {
       transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
     }
     .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
-    .result-sub { font-size: 15px; color: #BFBFBF; margin-top: 6px; }
+    .result-stars { font-size: 18px; margin: 4px 0; letter-spacing: 2px; color: #facc15; }
+    .result-sub { font-size: 15px; color: #BFBFBF; margin-top: 4px; }
     
     .result-stats { 
       display: flex; justify-content: space-evenly; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.15); 
@@ -243,12 +241,10 @@ body.dark-mode {
         });
       }
       
-      // Initialize Sliders
       ['atk', 'def', 'hp'].forEach(id => updateVal(id));
       calcAll();
     };
 
-    // Main Engine to roll digits independently
     function updateDigitRoll(containerId, newValue, height) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -256,10 +252,8 @@ body.dark-mode {
       const currentValStr = container.dataset.val || "";
       const newValStr = String(newValue);
 
-      // Skip if value hasn't changed
       if (currentValStr === newValStr) return;
 
-      // If the number of digits changes (e.g. 9 -> 10), instantly rebuild the columns
       if (currentValStr.length !== newValStr.length) {
         container.innerHTML = '';
         for (let char of newValStr) {
@@ -275,33 +269,27 @@ body.dark-mode {
           container.appendChild(col);
         }
       } else {
-        // Number of digits is the same. Animate ONLY the columns where the digit actually changed.
         const strips = container.querySelectorAll('.digit-strip');
         for (let i = 0; i < newValStr.length; i++) {
           if (currentValStr[i] !== newValStr[i]) {
             const strip = strips[i];
             
-            // Turn off transition to snap to starting position
             strip.style.transition = 'none';
             strip.style.transform = 'translateY(0)';
             
-            // Load the old digit on top, new digit on bottom
             strip.innerHTML = `
               <div style="height: ${height}px">${currentValStr[i]}</div>
               <div style="height: ${height}px">${newValStr[i]}</div>
             `;
             
-            // Force browser to acknowledge the instant reset before animating
             void strip.offsetHeight; 
             
-            // Turn transition back on and slide down to the new digit
             strip.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.35, 1)';
             strip.style.transform = `translateY(-${height}px)`;
           }
         }
       }
       
-      // Store the new value state
       container.dataset.val = newValStr;
     }
 
@@ -314,12 +302,12 @@ body.dark-mode {
       const percent = ((val - min) / (max - min)) * 100;
       slider.style.setProperty('--percent', `${percent}%`);
       
-      // Update slider number using the roller (20px height)
       updateDigitRoll(id + '-val-roller', val, 20);
     }
 
     function calcAll() {
       const resMain = document.getElementById("result-main");
+      const resStars = document.getElementById("result-stars");
       const resSub = document.getElementById("result-sub");
       
       const atkArc = document.getElementById("atk-arc");
@@ -337,10 +325,25 @@ body.dark-mode {
       const ivString = `${ivPercent}% IV (${ivSum}/45)`;
       const maxArcLength = 47.12; 
 
+      // Calculate star emojis based on standard Pokémon GO appraisal thresholds
+      let starsDisplay = "—";
+      if (ivSum === 45) {
+        starsDisplay = "⭐⭐⭐⭐ (4*)";
+      } else if (ivSum >= 37) {
+        starsDisplay = "⭐⭐⭐ (3*)";
+      } else if (ivSum >= 30) {
+        starsDisplay = "⭐⭐ (2*)";
+      } else if (ivSum >= 23) {
+        starsDisplay = "⭐ (1*)";
+      } else {
+        starsDisplay = "0*";
+      }
+
       const resetGauges = () => {
         updateDigitRoll('atk-gauge-roller', '-', 15);
         updateDigitRoll('def-gauge-roller', '-', 15);
         updateDigitRoll('hp-gauge-roller', '-', 15);
+        resStars.innerText = "—";
         atkArc.style.strokeDashoffset = maxArcLength;
         defArc.style.strokeDashoffset = maxArcLength;
         hpArc.style.strokeDashoffset = maxArcLength;
@@ -355,6 +358,7 @@ body.dark-mode {
 
       if (!nameInput || !cp || !lowerCaseDb[nameInput]) {
         resMain.innerText = "Level ?";
+        resStars.innerText = starsDisplay;
         resSub.innerText = lowerCaseDb[nameInput] ? `${ivString} • Enter CP` : `${ivString} • Enter valid species`;
         resetGauges();
         return;
@@ -382,9 +386,9 @@ body.dark-mode {
       const calculatedHp = Math.max(10, Math.floor(totalSta * selectedCPM));
 
       resMain.innerText = `Level ${closestLevel}`;
+      resStars.innerText = starsDisplay;
       resSub.innerText = ivString;
       
-      // Update the gauge numbers using the roller (15px height)
       updateDigitRoll('atk-gauge-roller', calculatedAtk, 15);
       updateDigitRoll('def-gauge-roller', calculatedDef, 15);
       updateDigitRoll('hp-gauge-roller', calculatedHp, 15);
@@ -441,6 +445,7 @@ body.dark-mode {
 
   <div class="result-container">
     <div id="result-main" class="result-main">Level ?</div>
+    <div id="result-stars" class="result-stars">—</div>
     <div id="result-sub" class="result-sub">100.00% IV (45/45) • Enter Name & CP</div>
     
     <div class="result-stats">
