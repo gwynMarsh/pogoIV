@@ -1,402 +1,229 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Plant Care & Fertilizer Tracker</title>
+  <title>Pokémon GO Evaluator</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-color: #f4f4f7;
-      --text-color: #333333;
-      --card-bg: #ffffff;
-      --card-border: #e5e7eb;
-      --input-bg: #ffffff;
-      --input-border: #ccc;
-      --accent-color: #0d9488;
-      --nav-bg: #ffffff;
-      --nav-border: #e5e7eb;
-      --card-inner: #f9fafb;
-      --overlay-bg: rgba(0, 0, 0, 0.4);
-      
-      --status-good: #0d9488; 
-      --status-due: #d97706;  
-      --status-overdue: #92400e; 
-    }
+  /* Theme Variables */
+   :root {
+  --bg-color: #f4f4f7;
+  --text-color: #333;
+  --input-bg: #fff;
+  --input-border: #ccc;
+  --slider-text: #444;
+  --track-color: #d1d1d6;
+  --mark-color: #aaa;
+  --mark-accent: #555;
+  --val-color: #DE7E00; 
+  --result-bg: #242424; 
+  --result-border: transparent;
+  --result-shadow: rgba(0, 0, 0, 0.25);
+}
 
-    body.dark-mode {
-      --bg-color: #121212;
-      --text-color: #f3f4f6;
-      --card-bg: #1f2937;
-      --card-border: #374151;
-      --input-bg: #111827;
-      --input-border: #374151;
-      --accent-color: #2dd4bf;
-      --nav-bg: #111827;
-      --nav-border: #1f2937;
-      --card-inner: #111827;
-      --overlay-bg: rgba(0, 0, 0, 0.7);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
-      padding: 20px 16px 80px 16px;
-      max-width: 360px;
-      margin: 0 auto;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      -webkit-tap-highlight-color: transparent;
+body.dark-mode {
+  --bg-color: #121212;
+  --text-color: #f3f4f6;
+  --input-bg: #1f2937;
+  --input-border: #374151;
+  --slider-text: #d1d5db;
+  --track-color: #4b5563;
+  --mark-color: #555;
+  --mark-accent: #aaa;
+  --val-color: #FF9D2E; 
+  --result-bg: #000000; 
+  --result-border: 1px solid #2d2d2d;
+  --result-shadow: rgba(0, 0, 0, 0.6); 
+}
+    
+    body { 
+      font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      padding: 20px 16px; 
+      max-width: 360px; 
+      margin: 0 auto; 
+      text-align: center; 
+      background-color: var(--bg-color); 
+      color: var(--text-color); 
+      -webkit-tap-highlight-color: transparent; 
       transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
+    } 
+    
     .header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
-
-    h2 { margin: 0; font-size: 20px; font-weight: 900; }
-
+    h2 { margin: 0; font-size: 22px; }
+    
     .theme-toggle {
       background: none;
       border: none;
-      font-size: 28px;
+      font-size: 32px; 
       cursor: pointer;
       padding: 4px;
     }
+    
+    .input-group { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 20px; text-align: left; }
+    
+    input[type="text"], 
+    input[type="number"] { 
+      font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+      width: 100%; 
+      padding: 14px 12px; 
+      font-size: 18px; 
+      box-sizing: border-box; 
+      border: 1.5px solid var(--input-border); 
+      border-radius: 12px; 
+      text-align: center; 
+      background: var(--input-bg); 
+      color: var(--text-color);
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+    } 
 
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 360px;
-      height: 60px;
-      background-color: var(--nav-bg);
-      border-top: 1px solid var(--nav-border);
-      display: flex;
-      justify-content: space-around;
+    .cp-input { margin-bottom: 16px; }
+    
+    .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
+    
+    /* DIGIT-BY-DIGIT ROLLER ENGINE */
+    .digit-roller {
+      display: inline-flex;
+      justify-content: flex-end;
       align-items: center;
-      z-index: 100;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      font-variant-numeric: tabular-nums; 
     }
-
-    .nav-item {
-      flex: 1;
+    .digit-col {
+      overflow: hidden;
+      display: inline-block;
+    }
+    .digit-strip {
       display: flex;
       flex-direction: column;
+    }
+    .digit-strip > div {
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: none;
-      border: none;
-      color: var(--text-color);
-      opacity: 0.5;
-      font-family: inherit;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 6px 0;
-      cursor: pointer;
-      transition: opacity 0.2s ease, color 0.2s ease;
+      line-height: 1;
     }
 
-    .nav-item.active { opacity: 1; color: var(--accent-color); }
-    .nav-icon { font-size: 20px; margin-bottom: 2px; }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-      text-align: left;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    .slider-header .digit-roller {
+      height: 20px;
+      color: var(--val-color);
+      font-size: 18px;
     }
 
-    .plant-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
+    .gauge-val-container {
+      z-index: 2;
+      margin-bottom: 2px;
     }
-
-    .plant-title { font-size: 17px; font-weight: 900; }
-    .plant-type { font-size: 12px; opacity: 0.7; margin-top: 2px; }
-
-    .badge {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 12px;
+    .gauge-val-container .digit-roller {
+      height: 15px;
       color: #ffffff;
-      white-space: nowrap;
-    }
-
-    .badge-good { background-color: var(--status-good); }
-    .badge-due { background-color: var(--status-due); }
-    .badge-overdue { background-color: var(--status-overdue); }
-
-    .date-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background-color: var(--card-inner);
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-      margin-bottom: 12px;
-    }
-
-    .date-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-    }
-
-    .date-label { font-weight: 700; opacity: 0.8; }
-    .date-val { font-weight: 900; color: var(--accent-color); }
-    
-    .date-input-inline {
-      padding: 4px 8px;
-      font-size: 13px;
-      font-family: inherit;
-      border-radius: 6px;
-      border: 1px solid var(--input-border);
-      background-color: var(--input-bg);
-      color: var(--text-color);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-      transition: opacity 0.15s ease, transform 0.1s ease;
-    }
-
-    .btn:active { transform: scale(0.98); }
-    .btn-primary { background-color: var(--accent-color); color: #ffffff; }
-    .btn-secondary { background-color: var(--card-inner); color: var(--text-color); border: 1px solid var(--card-border); }
-
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .btn-half {
-      flex: 1;
-      padding: 10px;
-      font-size: 13px;
-    }
-
-    .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
-    label { font-size: 12px; font-weight: 700; opacity: 0.8; }
-    input, select, textarea {
-      width: 100%; padding: 10px 12px; font-size: 15px; font-family: inherit;
-      border-radius: 8px; border: 1.5px solid var(--input-border);
-      background-color: var(--input-bg); color: var(--text-color); resize: vertical;
-    }
-
-    .calc-result { background: var(--card-inner); border-radius: 12px; padding: 14px; margin-top: 14px; border: 1px solid var(--card-border); }
-    .calc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed var(--card-border); padding-bottom: 4px; }
-    .calc-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .calc-val { font-weight: 900; color: var(--accent-color); }
-
-    .log-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--card-border); font-size: 13px; }
-    .log-item:last-child { border-bottom: none; }
-
-    #edit-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: var(--overlay-bg);
-      z-index: 200;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
-      backdrop-filter: blur(2px);
     }
     
-    .app-footer { margin-top: 24px; font-size: 11px; opacity: 0.6; text-align: center; }
+    input[type=range] { 
+      width: 100%; 
+      margin: 0; 
+      appearance: none; 
+      -webkit-appearance: none; 
+      background: linear-gradient(to right, var(--val-color) var(--percent, 100%), var(--track-color) var(--percent, 100%)); 
+      height: 6px;
+      border-radius: 3px;
+      outline: none; 
+      transition: background 0.3s ease;
+    }
+    input[type=range]::-webkit-slider-runnable-track { 
+      height: 6px; 
+      background: transparent; 
+      border-radius: 3px; 
+      cursor: pointer; 
+    }
+    input[type=range]::-webkit-slider-thumb { 
+      appearance: none; 
+      -webkit-appearance: none; 
+      height: 26px; 
+      width: 26px; 
+      border-radius: 50%; 
+      background: #fff; 
+      border: 1px solid #ccc; 
+      margin-top: -10px; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25); 
+      cursor: pointer; 
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; 
+    }
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      background-color: #facc15; 
+      border-color: #ca8a04;     
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .slider-marks { display: flex; justify-content: space-between; padding: 0 12px; margin-top: 8px; pointer-events: none; }
+    .slider-marks i { width: 1px; height: 3px; background: var(--mark-color); border-radius: 50%; }
+    .slider-marks i:nth-child(1),
+    .slider-marks i:nth-child(6),
+    .slider-marks i:nth-child(11),
+    .slider-marks i:nth-child(16) {
+      width: 3px; height: 6px; background: var(--mark-accent); border-radius: 2px;
+    }
+
+    .result-container {
+      background-color: var(--result-bg) !important;
+      border: var(--result-border);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 18px 16px;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px var(--result-shadow);
+      transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    }
+    .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
+    .result-stars { font-size: 18px; margin: 4px 0; letter-spacing: 2px; color: #facc15; }
+    .result-sub { font-size: 15px; color: #BFBFBF; margin-top: 4px; }
+    
+    .result-stats { 
+      display: flex; justify-content: space-evenly; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.15); 
+    }
+    .stat-col { 
+      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
+    }
+    .stat-col:not(:last-child) {
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    
+    .gauge-box {
+      position: relative; width: 72px; height: 42px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 2px;
+    }
+    .gauge-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    
+    .stat-label { 
+      font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; 
+    }
+
+    .app-footer {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      color: var(--text-color);
+      opacity: 0.7;
+      text-align: center;
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease;
+    }
   </style>
-</head>
-<body>
 
-  <!-- MODAL: Edit Plant -->
-  <div id="edit-modal">
-    <div class="card" style="width: 100%; max-width: 360px; margin: 0;">
-      <div style="font-weight: 900; margin-bottom: 12px;">Edit Plant Settings</div>
-      <div class="input-group">
-        <input type="hidden" id="edit-id">
-        <div>
-          <label>Plant Name</label>
-          <input type="text" id="edit-name">
-        </div>
-        <div>
-          <label>Fertilizer Assignment</label>
-          <select id="edit-type"></select>
-        </div>
-        <div>
-          <label>Fertilize Every (Days)</label>
-          <input type="number" id="edit-interval" min="1">
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-secondary btn-half" onclick="closeEditModal()">Cancel</button>
-        <button class="btn btn-primary btn-half" onclick="saveEdit()">Save Changes</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="header-row">
-    <h2 id="page-title">Fertilizer Schedule</h2>
-    <button id="theme-btn" class="theme-toggle" onclick="toggleTheme()">🌙</button>
-  </div>
-
-  <!-- TAB 1: SCHEDULE -->
-  <div id="tab-schedule" class="tab-content active">
-    <button class="btn btn-secondary" style="margin-bottom: 16px;" onclick="toggleAddForm()">+ Bulk Register Plants</button>
-
-    <div id="add-plant-card" class="card" style="display: none;">
-      <div style="font-weight: 900; margin-bottom: 12px;">Add Multiple Plants</div>
-      <div class="input-group">
-        <div>
-          <label>Plant Names (Separate by commas or new lines)</label>
-          <textarea id="bulk-names" rows="4" placeholder="e.g., Monstera, Bird's Nest Fern"></textarea>
-        </div>
-        <div>
-          <label>Fertilizer Assignment</label>
-          <select id="bulk-type"></select>
-        </div>
-        <div>
-          <label>Fertilize Every (Days)</label>
-          <input type="number" id="bulk-interval" value="14" min="1">
-        </div>
-        <div>
-          <label>Last Fertilized Date</label>
-          <input type="date" id="bulk-date">
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="bulkSavePlants()">Save All Plants</button>
-    </div>
-
-    <div id="plant-list"></div>
-  </div>
-
-  <!-- TAB 2: CALCULATOR -->
-  <div id="tab-calculator" class="tab-content">
-    <div class="card">
-      <div style="font-weight: 900; margin-bottom: 12px;">Mix Calculator</div>
-      <div class="input-group">
-        <div>
-          <label>Water Volume (Liters)</label>
-          <input type="number" id="calc-volume" value="1.5" step="0.1" oninput="runCalculator()">
-        </div>
-        <div>
-          <label>Select Fertilizer Recipe</label>
-          <select id="calc-recipe" onchange="runCalculator()"></select>
-        </div>
-      </div>
-      <div class="calc-result" id="recipe-output"></div>
-    </div>
-  </div>
-
-  <!-- TAB 3: LOGS & SYNC -->
-  <div id="tab-logs" class="tab-content">
-    <div class="card">
-      <div style="font-weight: 900; margin-bottom: 12px;">iCloud Backup & Sync</div>
-      <div style="display: flex; gap: 8px;">
-        <button class="btn btn-secondary" onclick="exportJSON()">Export JSON</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">Import JSON</button>
-      </div>
-      <input type="file" id="file-input" style="display: none;" accept=".json" onchange="importJSON(event)">
-    </div>
-
-    <div class="card">
-      <div style="font-weight: 900; margin-bottom: 12px;">Fertilization History</div>
-      <div id="logs-list"></div>
-    </div>
-  </div>
-
-  <div class="app-footer">© 2026 • Plant Care Tracker</div>
-
-  <div class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('schedule', 'Fertilizer Schedule')">
-      <span class="nav-icon">🪴</span><span>Schedule</span>
-    </button>
-    <button class="nav-item" onclick="switchTab('calculator', 'Mix Calculator')">
-      <span class="nav-icon">🧪</span><span>Calculator</span>
-    </button>
-    <button class="nav-item" onclick="switchTab('logs', 'Logs & Backup')">
-      <span class="nav-icon">📋</span><span>Logs</span>
-    </button>
-  </div>
+  <script src="db.js"></script>
 
   <script>
-    const recipeDb = {
-      "basic_foliar": {
-        name: "Basic Foliar Spray Mix",
-        ingredients: [
-          { name: "Liquid Kelp (Example)", ratio: 2.0, unit: "ml" },
-          { name: "Fish Emulsion (Example)", ratio: 1.0, unit: "ml" }
-        ]
-      },
-      "adv_foliar_1": {
-        name: "Advanced Foliar Spray (Formula 1)",
-        ingredients: [
-          { name: "Formula 1 Component A", ratio: 1.5, unit: "ml" }
-        ]
-      },
-      "adv_foliar_2": {
-        name: "Advanced Foliar Spray (Formula 2)",
-        ingredients: [
-          { name: "Formula 2 Component A", ratio: 2.0, unit: "ml" }
-        ]
-      },
-      "adv_foliar_3": {
-        name: "Advanced Foliar Spray (Formula 3)",
-        ingredients: [
-          { name: "Formula 3 Component A", ratio: 3.0, unit: "ml" }
-        ]
-      },
-      "adv_foliar_4": {
-        name: "Advanced Foliar Spray (Formula 4)",
-        ingredients: [
-          { name: "Formula 4 Component A", ratio: 1.0, unit: "ml" }
-        ]
-      },
-      "bio_boost": {
-        name: "Bio-boost Water Solution",
-        ingredients: [
-          { name: "Humic Acid", ratio: 1.0, unit: "g" }
-        ]
-      },
-      "bloom_trigger": {
-        name: "Bloom Trigger Solution",
-        ingredients: [
-          { name: "PK Booster", ratio: 3.0, unit: "ml" }
-        ]
-      }
-    };
-
-    let plants = [];
-    let logs = [];
+    let lowerCaseDb = {};
 
     function toggleTheme() {
       document.body.classList.toggle('dark-mode');
@@ -405,322 +232,272 @@
       localStorage.setItem('app-theme', isDark ? 'dark' : 'light');
     }
 
-    function formatDateDisplay(isoString) {
-      if (!isoString) return "Unknown";
-      const date = new Date(isoString);
-      return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-
-    function getTodayInputFormat() {
-      const today = new Date();
-      return today.toISOString().split('T')[0];
-    }
-
     window.onload = function() {
       if (localStorage.getItem('app-theme') === 'dark') {
         document.body.classList.add('dark-mode');
         document.getElementById('theme-btn').innerText = '☀️';
       }
-      document.getElementById('bulk-date').value = getTodayInputFormat();
+
+      const datalist = document.getElementById("pokemon-list");
+      if (typeof baseStatsDb !== 'undefined') {
+        Object.keys(baseStatsDb).forEach(name => {
+          const option = document.createElement("option");
+          option.value = name;
+          datalist.appendChild(option);
+          lowerCaseDb[name.toLowerCase()] = baseStatsDb[name];
+        });
+      }
       
-      populateDropdowns();
-      loadData();
-      renderSchedule();
-      runCalculator();
+      ['atk', 'def', 'hp'].forEach(id => updateVal(id));
+      calcAll();
     };
 
-    function populateDropdowns() {
-      const bulkSelect = document.getElementById('bulk-type');
-      const calcSelect = document.getElementById('calc-recipe');
-      const editSelect = document.getElementById('edit-type');
-      
-      for (const [key, data] of Object.entries(recipeDb)) {
-        bulkSelect.add(new Option(data.name, key));
-        calcSelect.add(new Option(data.name, key));
-        editSelect.add(new Option(data.name, key));
-      }
-    }
+    function updateDigitRoll(containerId, newValue, height) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
 
-    function loadData() {
-      plants = JSON.parse(localStorage.getItem('plant_care_plants') || '[]');
-      logs = JSON.parse(localStorage.getItem('plant_care_logs') || '[]');
-    }
+      const currentValStr = container.dataset.val || "";
+      const newValStr = String(newValue);
 
-    function saveData() {
-      localStorage.setItem('plant_care_plants', JSON.stringify(plants));
-      localStorage.setItem('plant_care_logs', JSON.stringify(logs));
-    }
+      if (currentValStr === newValStr) return;
 
-    function switchTab(tabId, title) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      if (currentValStr.length !== newValStr.length) {
+        container.innerHTML = '';
+        for (let char of newValStr) {
+          const col = document.createElement('div');
+          col.className = 'digit-col';
+          col.style.height = height + 'px';
 
-      document.getElementById('tab-' + tabId).classList.add('active');
-      document.getElementById('page-title').innerText = title;
+          const strip = document.createElement('div');
+          strip.className = 'digit-strip';
+          strip.innerHTML = `<div style="height: ${height}px">${char}</div>`;
 
-      const navIndex = tabId === 'schedule' ? 0 : tabId === 'calculator' ? 1 : 2;
-      document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
-
-      if (tabId === 'logs') renderLogs();
-    }
-
-    function toggleAddForm() {
-      const form = document.getElementById('add-plant-card');
-      form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function bulkSavePlants() {
-      const textInput = document.getElementById('bulk-names').value;
-      const recipeKey = document.getElementById('bulk-type').value;
-      const interval = parseInt(document.getElementById('bulk-interval').value, 10) || 14;
-      let dateInput = document.getElementById('bulk-date').value;
-      
-      if (!textInput.trim()) return;
-      if (!dateInput) dateInput = getTodayInputFormat();
-
-      const names = textInput.split(/,|\n/).map(n => n.trim()).filter(n => n.length > 0);
-      const fertilizerName = recipeDb[recipeKey].name;
-
-      names.forEach(name => {
-        plants.push({
-          id: 'p_' + Date.now() + Math.floor(Math.random() * 1000),
-          name: name,
-          type: fertilizerName,
-          interval: interval,
-          lastFertilized: dateInput
-        });
-      });
-
-      saveData();
-      renderSchedule();
-      
-      document.getElementById('bulk-names').value = '';
-      toggleAddForm();
-    }
-
-    function editFertilizerDate(id, newDate) {
-      if (!newDate) return;
-      const plant = plants.find(p => p.id === id);
-      if (plant) {
-        plant.lastFertilized = newDate;
-        saveData();
-        renderSchedule();
-      }
-    }
-
-    function waterPlant(id) {
-      const plant = plants.find(p => p.id === id);
-      if (!plant) return;
-
-      const today = getTodayInputFormat();
-      plant.lastFertilized = today;
-
-      logs.unshift({
-        plantName: plant.name,
-        type: plant.type,
-        date: formatDateDisplay(today)
-      });
-
-      // Auto-Pruning: Keeps JSON file lightweight by dropping logs past 1,000 entries
-      if (logs.length > 1000) {
-        logs = logs.slice(0, 1000);
-      }
-
-      saveData();
-      renderSchedule();
-    }
-
-    function openEditModal(id) {
-      const plant = plants.find(p => p.id === id);
-      if (!plant) return;
-      
-      document.getElementById('edit-id').value = plant.id;
-      document.getElementById('edit-name').value = plant.name;
-      document.getElementById('edit-interval').value = plant.interval;
-      
-      const editSelect = document.getElementById('edit-type');
-      for (let i = 0; i < editSelect.options.length; i++) {
-        if (editSelect.options[i].text === plant.type) {
-          editSelect.selectedIndex = i;
-          break;
+          col.appendChild(strip);
+          container.appendChild(col);
         }
-      }
-      
-      document.getElementById('edit-modal').style.display = 'flex';
-    }
-
-    function closeEditModal() {
-      document.getElementById('edit-modal').style.display = 'none';
-    }
-
-    function saveEdit() {
-      const id = document.getElementById('edit-id').value;
-      const plant = plants.find(p => p.id === id);
-      if (!plant) return;
-
-      const newName = document.getElementById('edit-name').value.trim();
-      const newInterval = parseInt(document.getElementById('edit-interval').value, 10);
-      const recipeKey = document.getElementById('edit-type').value;
-
-      if (newName && newInterval > 0) {
-        plant.name = newName;
-        plant.interval = newInterval;
-        plant.type = recipeDb[recipeKey].name;
-        
-        saveData();
-        renderSchedule();
-        closeEditModal();
-      }
-    }
-
-    function deletePlant(id) {
-      if (!confirm('Delete this plant profile?')) return;
-      plants = plants.filter(p => p.id !== id);
-      saveData();
-      renderSchedule();
-    }
-
-    function renderSchedule() {
-      const container = document.getElementById('plant-list');
-      container.innerHTML = '';
-
-      if (plants.length === 0) {
-        container.innerHTML = '<div style="opacity:0.6; padding: 20px 0;">No plants registered yet. Tap "+ Bulk Register Plants" above.</div>';
-        return;
-      }
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); 
-
-      plants.forEach(plant => {
-        // FAIL-SAFE: If old data lacks a date, it defaults to today so the UI never breaks.
-        const safeDate = plant.lastFertilized || getTodayInputFormat();
-        const lastDate = new Date(safeDate);
-        lastDate.setHours(0, 0, 0, 0);
-        
-        const diffTime = today - lastDate;
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        const daysLeft = plant.interval - diffDays;
-
-        const nextDate = new Date(lastDate);
-        nextDate.setDate(lastDate.getDate() + plant.interval);
-
-        let badgeClass = 'badge-good';
-        let badgeText = `${daysLeft} days left`;
-
-        if (daysLeft === 0) {
-          badgeClass = 'badge-due';
-          badgeText = 'Due Today';
-        } else if (daysLeft < 0) {
-          badgeClass = 'badge-overdue';
-          badgeText = `Overdue ${Math.abs(daysLeft)}d`;
-        }
-
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="plant-header">
-            <div>
-              <div class="plant-title">${plant.name}</div>
-              <div class="plant-type">${plant.type} • Every ${plant.interval} days</div>
-            </div>
-            <span class="badge ${badgeClass}">${badgeText}</span>
-          </div>
-
-          <div class="date-grid">
-            <div class="date-row">
-              <span class="date-label">Last Fed:</span>
-              <input type="date" class="date-input-inline" value="${safeDate}" onchange="editFertilizerDate('${plant.id}', this.value)">
-            </div>
-            <div class="date-row">
-              <span class="date-label">Next Due:</span>
-              <span class="date-val">${formatDateDisplay(nextDate)}</span>
-            </div>
-          </div>
-
-          <button class="btn btn-primary" onclick="waterPlant('${plant.id}')">Log Today & Reset Timer</button>
-          
-          <div class="btn-row">
-            <button class="btn btn-secondary btn-half" onclick="openEditModal('${plant.id}')">Edit Settings</button>
-            <button class="btn btn-secondary btn-half" onclick="deletePlant('${plant.id}')">Delete Plant</button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function runCalculator() {
-      const vol = parseFloat(document.getElementById('calc-volume').value) || 0;
-      const recipeKey = document.getElementById('calc-recipe').value;
-      const recipe = recipeDb[recipeKey];
-      const output = document.getElementById('recipe-output');
-      
-      let html = '';
-      if (recipe && recipe.ingredients.length > 0) {
-        recipe.ingredients.forEach(ing => {
-          const total = (ing.ratio * vol).toFixed(2);
-          html += `<div class="calc-row">
-                     <span>${ing.name}:</span>
-                     <span class="calc-val">${total} ${ing.unit}</span>
-                   </div>`;
-        });
       } else {
-        html = `<div style="opacity:0.6; font-size: 14px;">No ingredients configured.</div>`;
+        const strips = container.querySelectorAll('.digit-strip');
+        for (let i = 0; i < newValStr.length; i++) {
+          if (currentValStr[i] !== newValStr[i]) {
+            const strip = strips[i];
+            
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateY(0)';
+            
+            strip.innerHTML = `
+              <div style="height: ${height}px">${currentValStr[i]}</div>
+              <div style="height: ${height}px">${newValStr[i]}</div>
+            `;
+            
+            void strip.offsetHeight; 
+            
+            strip.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.35, 1)';
+            strip.style.transform = `translateY(-${height}px)`;
+          }
+        }
       }
-      output.innerHTML = html;
+      
+      container.dataset.val = newValStr;
     }
 
-    function renderLogs() {
-      const container = document.getElementById('logs-list');
-      container.innerHTML = '';
+    function updateVal(id) {
+      const slider = document.getElementById(id);
+      const val = parseInt(slider.value, 10);
+      
+      const min = parseInt(slider.min, 10) || 0;
+      const max = parseInt(slider.max, 10) || 15;
+      const percent = ((val - min) / (max - min)) * 100;
+      slider.style.setProperty('--percent', `${percent}%`);
+      
+      updateDigitRoll(id + '-val-roller', val, 20);
+    }
 
-      if (logs.length === 0) {
-        container.innerHTML = '<div style="opacity:0.6; padding: 12px 0;">No fertilization history yet.</div>';
+    function calcAll() {
+      const resMain = document.getElementById("result-main");
+      const resStars = document.getElementById("result-stars");
+      const resSub = document.getElementById("result-sub");
+      
+      const atkArc = document.getElementById("atk-arc");
+      const defArc = document.getElementById("def-arc");
+      const hpArc = document.getElementById("hp-arc");
+
+      const nameInput = document.getElementById("name").value.trim().toLowerCase();
+      const cp = Number(document.getElementById("cp").value);
+      const atkIV = Number(document.getElementById("atk").value) || 0;
+      const defIV = Number(document.getElementById("def").value) || 0;
+      const hpIV = Number(document.getElementById("hp").value) || 0;
+
+      const ivSum = atkIV + defIV + hpIV;
+      const ivPercent = ((ivSum / 45) * 100).toFixed(2);
+      const ivString = `${ivPercent}% IV (${ivSum}/45)`;
+      const maxArcLength = 47.12; 
+
+      let starsDisplay = "—";
+      if (ivSum === 45) {
+        starsDisplay = "⭐⭐⭐⭐ (4*)";
+      } else if (ivSum >= 37) {
+        starsDisplay = "⭐⭐⭐ (3*)";
+      } else if (ivSum >= 30) {
+        starsDisplay = "⭐⭐ (2*)";
+      } else if (ivSum >= 23) {
+        starsDisplay = "⭐ (1*)";
+      } else {
+        starsDisplay = "0*";
+      }
+
+      const resetGauges = () => {
+        updateDigitRoll('atk-gauge-roller', '-', 15);
+        updateDigitRoll('def-gauge-roller', '-', 15);
+        updateDigitRoll('hp-gauge-roller', '-', 15);
+        resStars.innerText = "—";
+        atkArc.style.strokeDashoffset = maxArcLength;
+        defArc.style.strokeDashoffset = maxArcLength;
+        hpArc.style.strokeDashoffset = maxArcLength;
+      };
+
+      if (typeof baseStatsDb === 'undefined' || typeof cpmTable === 'undefined') {
+        resMain.innerText = "Error";
+        resSub.innerText = "db.js not found";
+        resetGauges();
         return;
       }
 
-      logs.slice(0, 30).forEach(log => {
-        const item = document.createElement('div');
-        item.className = 'log-item';
-        item.innerHTML = `
-          <div><strong>${log.plantName}</strong><br><span style="font-size: 11px; opacity: 0.7;">${log.type}</span></div>
-          <div style="opacity: 0.7; text-align: right;">${log.date}</div>
-        `;
-        container.appendChild(item);
-      });
-    }
+      if (!nameInput || !cp || !lowerCaseDb[nameInput]) {
+        resMain.innerText = "Level ?";
+        resStars.innerText = starsDisplay;
+        resSub.innerText = lowerCaseDb[nameInput] ? `${ivString} • Enter CP` : `${ivString} • Enter valid species`;
+        resetGauges();
+        return;
+      }
 
-    function exportJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ plants, logs }, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `plant_care_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
+      const base = lowerCaseDb[nameInput];
+      const totalAtk = base[0] + atkIV;
+      const totalDef = base[1] + defIV;
+      const totalSta = base[2] + hpIV;
+      const targetCPM = Math.sqrt((10 * cp) / (totalAtk * Math.sqrt(totalDef) * Math.sqrt(totalSta)));
 
-    function importJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (imported.plants && imported.logs) {
-            plants = imported.plants;
-            logs = imported.logs;
-            saveData();
-            renderSchedule();
-            alert('Data restored successfully!');
-          }
-        } catch (err) {
-          alert('Invalid backup JSON file.');
+      let closestLevel = 1.0;
+      let minDiff = Infinity;
+      for (const [lvl, cpm] of Object.entries(cpmTable)) {
+        const diff = Math.abs(targetCPM - cpm);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestLevel = lvl;
         }
-      };
-      reader.readAsText(file);
+      }
+
+      const selectedCPM = cpmTable[closestLevel];
+      const calculatedAtk = Number((totalAtk * selectedCPM).toFixed(1));
+      const calculatedDef = Number((totalDef * selectedCPM).toFixed(1));
+      const calculatedHp = Math.max(10, Math.floor(totalSta * selectedCPM));
+
+      resMain.innerText = `Level ${closestLevel}`;
+      resStars.innerText = starsDisplay;
+      resSub.innerText = ivString;
+      
+      updateDigitRoll('atk-gauge-roller', calculatedAtk, 15);
+      updateDigitRoll('def-gauge-roller', calculatedDef, 15);
+      updateDigitRoll('hp-gauge-roller', calculatedHp, 15);
+
+      const statCap = 350;
+      const atkRatio = Math.min(1, calculatedAtk / statCap);
+      const defRatio = Math.min(1, calculatedDef / statCap);
+      const hpRatio = Math.min(1, calculatedHp / statCap);
+
+      atkArc.style.strokeDashoffset = maxArcLength * (1 - atkRatio);
+      defArc.style.strokeDashoffset = maxArcLength * (1 - defRatio);
+      hpArc.style.strokeDashoffset = maxArcLength * (1 - hpRatio);
     }
   </script>
+</head>
+<body>
+  <div class="header-row">
+    <h2>Pokémon Evaluator</h2>
+    <button id="theme-btn" class="theme-toggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  
+  <div class="input-group">
+    <input id="name" type="text" list="pokemon-list" placeholder="Pokémon Name" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" oninput="calcAll()">
+    <datalist id="pokemon-list"></datalist>
+    <input id="cp" class="cp-input" type="number" inputmode="numeric" placeholder="CP" autocomplete="off" oninput="calcAll()">
+    
+    <div class="slider-wrapper">
+      <div class="slider-header">
+        <span>Attack IV</span>
+        <div class="digit-roller" id="atk-val-roller"></div>
+      </div>
+      <input type="range" id="atk" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('atk'); calcAll()">
+      <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="slider-wrapper">
+      <div class="slider-header">
+        <span>Defense IV</span>
+        <div class="digit-roller" id="def-val-roller"></div>
+      </div>
+      <input type="range" id="def" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('def'); calcAll()">
+      <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="slider-wrapper">
+      <div class="slider-header">
+        <span>HP IV</span>
+        <div class="digit-roller" id="hp-val-roller"></div>
+      </div>
+      <input type="range" id="hp" class="slider" min="0" max="15" step="1" value="15" oninput="updateVal('hp'); calcAll()">
+      <div class="slider-marks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+  </div>
+
+  <div class="result-container">
+    <div id="result-main" class="result-main">Level ?</div>
+    <div id="result-stars" class="result-stars">—</div>
+    <div id="result-sub" class="result-sub">100.00% IV (45/45) • Enter Name & CP</div>
+    
+    <div class="result-stats">
+      <div class="stat-col">
+        <div class="gauge-box">
+          <svg viewBox="0 0 36 21" class="gauge-svg">
+            <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
+            <path id="atk-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#FF5252" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+          </svg>
+          <div class="gauge-val-container">
+            <div class="digit-roller" id="atk-gauge-roller"></div>
+          </div>
+        </div>
+        <div class="stat-label" style="color: #FF5252;">ATK</div>
+      </div>
+
+      <div class="stat-col">
+        <div class="gauge-box">
+          <svg viewBox="0 0 36 21" class="gauge-svg">
+            <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
+            <path id="def-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#4DF1FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+          </svg>
+          <div class="gauge-val-container">
+            <div class="digit-roller" id="def-gauge-roller"></div>
+          </div>
+        </div>
+        <div class="stat-label" style="color: #4DF1FF;">DEF</div>
+      </div>
+
+      <div class="stat-col">
+        <div class="gauge-box">
+          <svg viewBox="0 0 36 21" class="gauge-svg">
+            <path d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
+            <path id="hp-arc" d="M 3 18 A 15 15 0 0 1 33 18" fill="none" stroke="#5CFF40" stroke-width="3" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12" style="transition: stroke-dashoffset 0.3s ease;"/>
+          </svg>
+          <div class="gauge-val-container">
+            <div class="digit-roller" id="hp-gauge-roller"></div>
+          </div>
+        </div>
+        <div class="stat-label" style="color: #5CFF40;">HP</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-footer">
+    ©2026 GwynMarsh • Pokémon GO Evaluator
+  </div>
 </body>
 </html>
