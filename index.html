@@ -90,7 +90,9 @@ body.dark-mode {
     .slider-wrapper { margin-bottom: 8px; padding: 0 4px; }
     .slider-header { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--slider-text); }
     
-    /* DIGIT-BY-DIGIT ROLLER ENGINE */
+    /* --------------------------------- */
+    /* DIGIT-BY-DIGIT ROLLER ENGINE  */
+    /* --------------------------------- */
     .digit-roller {
       display: inline-flex;
       justify-content: flex-end;
@@ -128,6 +130,17 @@ body.dark-mode {
       font-size: 15px;
       font-weight: 700;
     }
+      .app-footer {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      color: var(--text-color);
+      opacity: 0.6;
+      text-align: center;
+      letter-spacing: 0.5px;
+      }
+    
+    /* --------------------------------- */
     
     input[type=range] { 
       width: 100%; 
@@ -185,9 +198,9 @@ body.dark-mode {
       box-shadow: 0 4px 12px var(--result-shadow);
       transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
     }
-    .result-main { font-size: 24px; font-weight: bold; color: #ffffff; }
-    .result-stars { font-size: 18px; margin: 4px 0; letter-spacing: 2px; color: #facc15; }
-    .result-sub { font-size: 15px; color: #BFBFBF; margin-top: 4px; }
+    .result-main { font-size: 28px; font-weight: bold; color: #ffffff; }
+    .result-stars { font-size: 20px; margin: 5px 0; letter-spacing: 5px; color: #facc15; }
+    .result-sub { font-size: 15px; letter-spacing: 0.5px; color: #BFBFBF; margin-top: 5px; }
     
     .result-stats { 
       display: flex; justify-content: space-evenly; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.15); 
@@ -206,17 +219,6 @@ body.dark-mode {
     
     .stat-label { 
       font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; 
-    }
-
-    .app-footer {
-      margin-top: 24px;
-      margin-bottom: 8px;
-      font-size: 11px;
-      color: var(--text-color);
-      opacity: 0.7;
-      text-align: center;
-      letter-spacing: 0.5px;
-      transition: color 0.3s ease;
     }
   </style>
 
@@ -332,17 +334,18 @@ body.dark-mode {
       const ivString = `${ivPercent}% IV (${ivSum}/45)`;
       const maxArcLength = 47.12; 
 
+      // Calculate star emojis based on standard Pokémon GO appraisal thresholds
       let starsDisplay = "—";
       if (ivSum === 45) {
-        starsDisplay = "⭐⭐⭐⭐ (4*)";
+        starsDisplay = "★★★★";
       } else if (ivSum >= 37) {
-        starsDisplay = "⭐⭐⭐ (3*)";
+        starsDisplay = "★★★☆";
       } else if (ivSum >= 30) {
-        starsDisplay = "⭐⭐ (2*)";
+        starsDisplay = "★★☆☆";
       } else if (ivSum >= 23) {
-        starsDisplay = "⭐ (1*)";
+        starsDisplay = "★☆☆☆";
       } else {
-        starsDisplay = "0*";
+        starsDisplay = "☆☆☆☆";
       }
 
       const resetGauges = () => {
@@ -450,11 +453,11 @@ body.dark-mode {
   </div>
 
   <div class="result-container">
-    <div id="result-main" class="result-main">Level ?</div>
+    <div id="result-main" class="result-main">Level ???</div>
     <div id="result-stars" class="result-stars">—</div>
     <div id="result-sub" class="result-sub">100.00% IV (45/45) • Enter Name & CP</div>
     
-    <div class="result-stats">
+    <div class="result-stats"> 
       <div class="stat-col">
         <div class="gauge-box">
           <svg viewBox="0 0 36 21" class="gauge-svg">
@@ -495,9 +498,8 @@ body.dark-mode {
       </div>
     </div>
   </div>
-
   <div class="app-footer">
-    ©2026 GwynMarsh • Pokémon GO Evaluator
+    © 2026 GwynMarsh • Pokémon GO Search Builder
   </div>
 </body>
 </html>
