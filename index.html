@@ -221,7 +221,6 @@
     .log-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--card-border); font-size: 13px; }
     .log-item:last-child { border-bottom: none; }
 
-    /* Edit Modal Overlay */
     #edit-modal {
       display: none;
       position: fixed;
@@ -522,7 +521,7 @@
         date: formatDateDisplay(today)
       });
 
-      // Optimization: Cap logs at 1000 entries to prevent infinite JSON file growth
+      // Auto-Pruning: Keeps JSON file lightweight by dropping logs past 1,000 entries
       if (logs.length > 1000) {
         logs = logs.slice(0, 1000);
       }
@@ -594,7 +593,9 @@
       today.setHours(0, 0, 0, 0); 
 
       plants.forEach(plant => {
-        const lastDate = new Date(plant.lastFertilized);
+        // FAIL-SAFE: If old data lacks a date, it defaults to today so the UI never breaks.
+        const safeDate = plant.lastFertilized || getTodayInputFormat();
+        const lastDate = new Date(safeDate);
         lastDate.setHours(0, 0, 0, 0);
         
         const diffTime = today - lastDate;
@@ -629,7 +630,7 @@
           <div class="date-grid">
             <div class="date-row">
               <span class="date-label">Last Fed:</span>
-              <input type="date" class="date-input-inline" value="${plant.lastFertilized}" onchange="editFertilizerDate('${plant.id}', this.value)">
+              <input type="date" class="date-input-inline" value="${safeDate}" onchange="editFertilizerDate('${plant.id}', this.value)">
             </div>
             <div class="date-row">
               <span class="date-label">Next Due:</span>
